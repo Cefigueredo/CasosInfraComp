@@ -28,5 +28,8 @@ public void soltar(){
 	if(tieneCubierto1== true && tieneCubierto2== false) {
 		
 	}
+	else if(tieneCubierto1== false && tieneCubierto2 == true){
+		
+	}
 }
 }
