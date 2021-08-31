@@ -47,6 +47,7 @@ public class Lavaplatos extends Thread{
 		//Aumenta cubiertos limpios
 		Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()+1);
 		Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
+		notify();
 		
 	}
 

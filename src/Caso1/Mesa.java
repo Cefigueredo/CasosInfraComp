@@ -1,55 +1,64 @@
 package Caso1;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Mesa {
-	private Comensal comensal;
+	private static int numComensales;
 	private static int numCubiertosT1;
 	private static int numCubiertosT2;
 	private static int numCubiertosSuciosT1;
 	private static int numCubiertosSuciosT2;
 	private static int numPlatos;
-
-	
-	
-	public synchronized void recogerCubiertosT1()
-	{
-		try {
-			while(numCubiertosT1 == 0){
-
-				wait();
-			} 
-			numCubiertosT1 --;
+	private static int tamFregadero;
+	public static void main(String[] args) throws Exception{
+		Mesa instancia = new Mesa();
+		try ( //Se recibe la lectura de consola
+				InputStreamReader is= new InputStreamReader(System.in);
+				BufferedReader br = new BufferedReader(is);
+				) { 
+			String line = br.readLine();
+			
+			
+			String str = line.split("= ")[1];
+			numComensales = Integer.parseInt(str);
+			line = br.readLine();
+			str = line.split("= ")[1];
+			numCubiertosT1 = Integer.parseInt(str);
+			line = br.readLine();
+			str = line.split("= ")[1];
+			numCubiertosT2 = Integer.parseInt(str);
+			line = br.readLine();
+			str = line.split("= ")[1];
+			numPlatos = Integer.parseInt(str);
+			line = br.readLine();
+			str = line.split("= ")[1];
+			tamFregadero = Integer.parseInt(str);
+			Fregadero.setTamFregadero(tamFregadero);
+			
+			for(int i = 0; i < numComensales; i++) {
+				new Comensal().start();
+			}
+			
+			
+			is.close();
+			br.close();
+			
 		}
-		catch (InterruptedException e) {
-
+		catch (IOException e) {
 			e.printStackTrace();
 		}
-
-	}
-	public synchronized void recogerCubiertosT2()
-	{
-		try {
-			while(numCubiertosT2 == 0){
-
-				wait();
-			} 
-			numCubiertosT2 --;
-		}
-		catch (InterruptedException e) {
-
-			e.printStackTrace();
-		}
-
 	}
 	
 	//----------------------------
 	//Getters and setters
 	//-----------------------------
-	public Comensal getComensal() {
-		return comensal;
+	public int getComensal() {
+		return numComensales;
 	}
-	public void setComensal(Comensal comensal) {
-		this.comensal = comensal;
+	public void setComensal(int comensal) {
+		this.numComensales= comensal;
 	}
 	public static int getNumCubiertosT1() {
 		return numCubiertosT1;
