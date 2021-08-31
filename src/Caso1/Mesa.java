@@ -36,7 +36,7 @@ public class Mesa {
 			str = line.split("= ")[1];
 			tamFregadero = Integer.parseInt(str);
 			Fregadero.setTamFregadero(tamFregadero);
-			
+			new Lavaplatos().start();
 			for(int i = 0; i < numComensales; i++) {
 				new Comensal().start();
 			}

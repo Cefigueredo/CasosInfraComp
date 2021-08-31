@@ -4,17 +4,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Comensal extends Thread{
 	
-	private int numPlatos = Mesa.getNumPlatos();
 	private boolean tieneCubierto1 = false;
 	private boolean tieneCubierto2 = false;
 
 
 	public void run() {
 		try {
-			while(numPlatos != 0) {
+			while(Mesa.getNumPlatos() != 0) {
 				cogerCubiertos(); System.out.println("Coge Cubiertos");
 				comer(); System.out.println("Come");
 				dejarCubiertosFregadero(); System.out.println("Deja cubiertos en fregadero");
+				
+				
 			}
 		}
 		catch(Exception e) {}
@@ -25,16 +26,14 @@ public class Comensal extends Thread{
 	/**
 	 * Come entre 3 y 5 seg y reposa entre 1 y 3 seg
 	 */
-	public void comer(){
+	public synchronized void comer(){
 		try {
-				/// Comer: Tardar entre 3 y 5 seg aleatoriamente
-				// nextInt is normally exclusive of the top value,
-				// so add 1 to make it inclusive
-				int randomNum = ThreadLocalRandom.current().nextInt(3, 5 + 1);
-				sleep(randomNum*1000);	
-				// Reposa entre 1 y 3 seg aleatoriamente
-				randomNum = ThreadLocalRandom.current().nextInt(1, 3 + 1);
-				sleep(randomNum*1000);
+			Mesa.setNumPlatos(Mesa.getNumPlatos()-1);System.out.println("Quedan "+Mesa.getNumPlatos()+" platos.");
+			/// Comer: Tardar entre 3 y 5 seg aleatoriamente
+			// nextInt is normally exclusive of the top value,
+			// so add 1 to make it inclusive
+			int randomNum = ThreadLocalRandom.current().nextInt(3, 5 + 1);
+			sleep(randomNum*1000);	
 		}
 		catch(Exception e) {e.printStackTrace();}
 	}
@@ -42,7 +41,7 @@ public class Comensal extends Thread{
 	/**
 	 * Debe salir habiendo cogido 2 cubiertos
 	 */
-	public void cogerCubiertos() {
+	public synchronized void cogerCubiertos() {
 		try {
 			while(tieneCubierto1 == false || tieneCubierto2 == false) {
 				cogerCubiertoT1();
@@ -50,7 +49,7 @@ public class Comensal extends Thread{
 					long l = System.currentTimeMillis();
 					cogerCubiertoT2();
 					if(System.currentTimeMillis()-l>1000) {
-						tieneCubierto1 = false;
+						tieneCubierto1 = false; System.out.println("Suelta cubierto T1");
 					}
 				}
 			}
@@ -58,10 +57,10 @@ public class Comensal extends Thread{
 		catch(Exception e) {}
 	}
 	
-	public void cogerCubiertoT1() {
+	public synchronized void cogerCubiertoT1() {
 		try {
 			if(Mesa.getNumCubiertosT1()>0 && tieneCubierto1 == false) {//Si hay T1, lo toma
-				tieneCubierto1 = true;System.out.println("Coge cubierto T1");
+				tieneCubierto1 = true;
 				Mesa.setNumCubiertosSuciosT1(Mesa.getNumCubiertosSuciosT1()+1);
 				Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()-1);
 			}
@@ -71,10 +70,10 @@ public class Comensal extends Thread{
 		}
 		catch(Exception e) {}
 	}
-	public void cogerCubiertoT2() {
+	public synchronized void cogerCubiertoT2() {
 		try {
 			if(Mesa.getNumCubiertosT2()>0 && tieneCubierto2 == false){//Si hay T2, lo toma
-				tieneCubierto2 = true; System.out.println("Coge cubierto T2");
+				tieneCubierto2 = true;
 				Mesa.setNumCubiertosSuciosT2(Mesa.getNumCubiertosSuciosT2()+1);
 				Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()-1);
 			}
@@ -88,7 +87,7 @@ public class Comensal extends Thread{
 	/**
 	 *Deja sus cubiertos en el fregadero 
 	 */
-	public void dejarCubiertosFregadero() {
+	public synchronized void dejarCubiertosFregadero() {
 		try {
 			//Tarda un tiempo aleatorio entre 1 y 3 seg
 			// nextInt is normally exclusive of the top value,
@@ -102,17 +101,9 @@ public class Comensal extends Thread{
 			tieneCubierto1 = false;
 			tieneCubierto2 = false;
 			
+			notifyAll();//Avisa al lavaplatos
 			
 		}
 		catch(Exception e) {}
-	}
-
-	public void soltar(){
-		if(tieneCubierto1== true && tieneCubierto2== false) {
-
-		}
-		else if(tieneCubierto1== false && tieneCubierto2 == true){
-
-		}
 	}
 }
