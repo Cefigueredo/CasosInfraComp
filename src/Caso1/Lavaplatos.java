@@ -6,15 +6,28 @@ public class Lavaplatos extends Thread{
 
 	public void run() {
 		try {
-			while(Mesa.getNumPlatos() != 0) {
-				if(Fregadero.getCantCubiertos() > 0) {
-					
-					recogerCubiertosFregadero();
-					lavar();
-					ponerCubiertosMesa();
+//			while(Mesa.getNumPlatos() != 0 ) {
+//				if(Fregadero.getCantCubiertos()==0)
+//					Lavaplatos.yield();
+//				else if(Fregadero.getCantCubiertos() > 0) {
+//					
+//					recogerCubiertosFregadero();
+//					lavar();
+//					ponerCubiertosMesa();
+//				}
+//				sleep(10);
+//			}
+			
+			while(Fregadero.getCantCubiertos() > 0) {
+				recogerCubiertosFregadero();
+				lavar();
+				ponerCubiertosMesa();
+				while(Fregadero.getCantCubiertos() == 0) {
+					System.out.println("Lavaplatos cede fregadero.....");
+					Lavaplatos.yield(); 
 				}
-				sleep(10);
 			}
+
 		}
 		catch(Exception e) {
 			
@@ -25,7 +38,7 @@ public class Lavaplatos extends Thread{
 	 * 
 	 */
 	public synchronized void recogerCubiertosFregadero() {
-		Fregadero.setCantCubiertos(Fregadero.getCantCubiertos()-2);
+		Fregadero.setCantCubiertos(Fregadero.getCantCubiertos()-1);
 	}
 	
 	/**

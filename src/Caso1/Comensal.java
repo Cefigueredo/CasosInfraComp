@@ -1,13 +1,17 @@
 package Caso1;
-
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Comensal extends Thread{
 	
 	private boolean tieneCubierto1 = false;
 	private boolean tieneCubierto2 = false;
-
-
+	private static boolean llegaMitadCena = false;
+	private static CyclicBarrier cb;
+	
+	public Comensal(CyclicBarrier cb) {
+		this.cb = cb;
+	}
 	public void run() {
 		try {
 			while(Mesa.getNumPlatos() != 0) {
@@ -29,11 +33,22 @@ public class Comensal extends Thread{
 	public synchronized void comer(){
 		try {
 			Mesa.setNumPlatos(Mesa.getNumPlatos()-1);System.out.println("Quedan "+Mesa.getNumPlatos()+" platos.");
-			/// Comer: Tardar entre 3 y 5 seg aleatoriamente
-			// nextInt is normally exclusive of the top value,
-			// so add 1 to make it inclusive
-			int randomNum = ThreadLocalRandom.current().nextInt(3, 5 + 1);
-			sleep(randomNum*1000);	
+			if(llegaMitadCena == false && Mesa.getNumPlatos() > Mesa.getMitadPlatos()) {
+				cb.await(); System.out.println("Espero a otros comensales.");
+
+			}
+			
+			if(llegaMitadCena == false && Mesa.getNumPlatos() == Mesa.getMitadPlatos()) {
+				llegaMitadCena = true; System.out.println("Llegué a mitad de cena.");
+			}
+			if(llegaMitadCena == true) {
+				System.out.println("Empieza a comer.");
+				/// Comer: Tardar entre 3 y 5 seg aleatoriamente
+				// nextInt is normally exclusive of the top value,
+				// so add 1 to make it inclusive
+				int randomNum = ThreadLocalRandom.current().nextInt(3, 5 + 1);
+				sleep(randomNum*1000);
+			}
 		}
 		catch(Exception e) {e.printStackTrace();}
 	}
@@ -95,12 +110,17 @@ public class Comensal extends Thread{
 			int randomNum = ThreadLocalRandom.current().nextInt(1, 3 + 1);
 			sleep(randomNum*1000);
 			
-			//Deja 2 cubiertos en el fregadero
-			Fregadero.setCantCubiertos(Fregadero.getCantCubiertos()+2);
+			while(Fregadero.getTamFregadero() == Fregadero.getCantCubiertos()) {
+				System.out.println("Comensal cede fregadero.........");
+				Comensal.yield();
+			}
+			
+			//Deja 1 par de  cubiertos en el fregadero
+			Fregadero.setCantCubiertos(Fregadero.getCantCubiertos()+1);
 			//Ya no tiene cubiertos
 			tieneCubierto1 = false;
 			tieneCubierto2 = false;
-			
+
 			notifyAll();//Avisa al lavaplatos
 			
 		}

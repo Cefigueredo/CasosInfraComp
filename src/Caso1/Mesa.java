@@ -3,17 +3,26 @@ package Caso1;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.CyclicBarrier;
 
 public class Mesa {
-	private static int numComensales;
+	
 	private static int numCubiertosT1;
 	private static int numCubiertosT2;
 	private static int numCubiertosSuciosT1;
 	private static int numCubiertosSuciosT2;
 	private static int numPlatos;
 	private static int tamFregadero;
+	private static int mitadPlatos = 0;
+	public static int getMitadPlatos() {
+		return mitadPlatos;
+	}
+
+	public static void setMitadPlatos(int mitadPlatos) {
+		Mesa.mitadPlatos = mitadPlatos;
+	}
+
 	public static void main(String[] args) throws Exception{
-		Mesa instancia = new Mesa();
 		try ( //Se recibe la lectura de consola
 				InputStreamReader is= new InputStreamReader(System.in);
 				BufferedReader br = new BufferedReader(is);
@@ -32,16 +41,19 @@ public class Mesa {
 			line = br.readLine();
 			str = line.split("= ")[1];
 			numPlatos = Integer.parseInt(str);
+			mitadPlatos = (int) Math.ceil(numPlatos/2);
 			line = br.readLine();
 			str = line.split("= ")[1];
 			tamFregadero = Integer.parseInt(str);
 			Fregadero.setTamFregadero(tamFregadero);
+			int barrera = mitadPlatos;
+			CyclicBarrier cb = new CyclicBarrier(barrera);
+			
+			
 			new Lavaplatos().start();
 			for(int i = 0; i < numComensales; i++) {
-				new Comensal().start();
+				new Comensal(cb).start();
 			}
-			
-			
 			is.close();
 			br.close();
 			
@@ -58,7 +70,7 @@ public class Mesa {
 		return numComensales;
 	}
 	public void setComensal(int comensal) {
-		this.numComensales= comensal;
+		Mesa.numComensales= comensal;
 	}
 	public static int getNumCubiertosT1() {
 		return numCubiertosT1;
@@ -89,6 +101,23 @@ public class Mesa {
 	}
 	public static void setNumPlatos(int numPlatos) {
 		Mesa.numPlatos = numPlatos;
+	}
+	
+	private static int numComensales;
+	public static int getNumComensales() {
+		return numComensales;
+	}
+
+	public static void setNumComensales(int numComensales) {
+		Mesa.numComensales = numComensales;
+	}
+
+	public static int getTamFregadero() {
+		return tamFregadero;
+	}
+
+	public static void setTamFregadero(int tamFregadero) {
+		Mesa.tamFregadero = tamFregadero;
 	}
 	//------------------------------------------------
 
