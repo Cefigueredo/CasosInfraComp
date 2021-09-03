@@ -33,12 +33,12 @@ public class Comensal extends Thread{
 	public synchronized void comer(){
 		try {
 			Mesa.setNumPlatos(Mesa.getNumPlatos()-1);System.out.println("Quedan "+Mesa.getNumPlatos()+" platos.");
-			if(llegaMitadCena == false && Mesa.getNumPlatos() > Mesa.getMitadPlatos()) {
+			if(llegaMitadCena == false && Mesa.getNumPlatos() > Mesa.getMitadCena()) {
 				cb.await(); System.out.println("Espero a otros comensales.");
 
 			}
 			
-			if(llegaMitadCena == false && Mesa.getNumPlatos() == Mesa.getMitadPlatos()) {
+			if(llegaMitadCena == false && Mesa.getNumPlatos() == Mesa.getMitadCena()) {
 				llegaMitadCena = true; System.out.println("Llegué a mitad de cena.");
 			}
 			if(llegaMitadCena == true) {

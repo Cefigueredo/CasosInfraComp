@@ -6,21 +6,14 @@ import java.io.InputStreamReader;
 import java.util.concurrent.CyclicBarrier;
 
 public class Mesa {
-	
+	private static int numComensales;
 	private static int numCubiertosT1;
 	private static int numCubiertosT2;
 	private static int numCubiertosSuciosT1;
 	private static int numCubiertosSuciosT2;
 	private static int numPlatos;
 	private static int tamFregadero;
-	private static int mitadPlatos = 0;
-	public static int getMitadPlatos() {
-		return mitadPlatos;
-	}
-
-	public static void setMitadPlatos(int mitadPlatos) {
-		Mesa.mitadPlatos = mitadPlatos;
-	}
+	private static int mitadCena = 0;
 
 	public static void main(String[] args) throws Exception{
 		try ( //Se recibe la lectura de consola
@@ -41,12 +34,12 @@ public class Mesa {
 			line = br.readLine();
 			str = line.split("= ")[1];
 			numPlatos = Integer.parseInt(str);
-			mitadPlatos = (int) Math.ceil(numPlatos/2);
+			mitadCena = (int) Math.ceil(numComensales/2);
 			line = br.readLine();
 			str = line.split("= ")[1];
 			tamFregadero = Integer.parseInt(str);
 			Fregadero.setTamFregadero(tamFregadero);
-			int barrera = mitadPlatos;
+			int barrera = mitadCena;
 			CyclicBarrier cb = new CyclicBarrier(barrera);
 			
 			
@@ -63,6 +56,14 @@ public class Mesa {
 		}
 	}
 	
+	public static int getMitadCena() {
+		return mitadCena;
+	}
+
+	public static void setMitadCena(int mitadCena) {
+		Mesa.mitadCena = mitadCena;
+	}
+
 	//----------------------------
 	//Getters and setters
 	//-----------------------------
@@ -103,7 +104,7 @@ public class Mesa {
 		Mesa.numPlatos = numPlatos;
 	}
 	
-	private static int numComensales;
+
 	public static int getNumComensales() {
 		return numComensales;
 	}
