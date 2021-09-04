@@ -3,7 +3,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Comensal extends Thread{
 
-
+	//---------------------------------------------------------------------------------------
+	// Atributos
+	//---------------------------------------------------------------------------------------
 	private boolean tieneCubierto1 = false;
 	private boolean tieneCubierto2 = false;
 	private CyclicBarrier cb;
@@ -11,18 +13,18 @@ public class Comensal extends Thread{
 	private int platosComidos = 0;
 	private int platosFaltan;
 
-
-
 	public Comensal(CyclicBarrier cb,int id) {
 		this.cb = cb;
 		this.id = id;
 	}
 
+	//---------------------------------------------------------------------------------------
+	// Métodos
+	//---------------------------------------------------------------------------------------
 	public void run() {
 		try {
 			while(platosComidos != Mesa.getNumPlatos()) {
 				cogerCubiertos();
-				//soltar
 				System.out.println("Coge Cubiertos el comensal " + id);
 				comer(); 
 				dejarCubiertosFregadero();
@@ -30,16 +32,15 @@ public class Comensal extends Thread{
 				despertar();
 
 			}
-			System.out.println("El comensal " + id + " termino la cena" );
+			System.out.println("---  El comensal " + id + " terminó la cena  ---" );
 			Mesa.setComensalesTerminaron(Mesa.getComensalesTerminaron()+1);
 		}
 		catch(Exception e) {}
-
-
 	}
 
-
-
+	/**
+	 * El comensal come y espera un tiempo aleatorio entre 3 y 5 segundos.
+	 */
 	public synchronized void comer(){
 		try {
 			if(platosComidos == Mesa.getMitadPlatos()) {
@@ -53,71 +54,15 @@ public class Comensal extends Thread{
 			sleep(randomNum*1000);
 			platosComidos ++;
 			platosFaltan = Mesa.getNumPlatos()-platosComidos;
-			System.out.println("Quendan "+ platosFaltan +" platos para que el comensal " + id +" termine la cena");
-
-
-			/// Comer: Tardar entre 3 y 5 seg aleatoriamente
-			// nextInt is normally exclusive of the top value,
-			// so add 1 to make it inclusive
+			System.out.println("Quedan "+ platosFaltan +" platos para que el comensal " + id +" termine la cena");
 
 		}
 		catch(Exception e) {e.printStackTrace();}
 	}
-
-	public synchronized void recogerCubiertosT1()
-	{
-		try {
-			while(Mesa.getNumCubiertosT1() == 0){
-
-
-				wait();
-			} 
-			Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()-1);
-
-		}
-		catch (InterruptedException e) {
-
-			e.printStackTrace();
-		}
-
-	}
-	public synchronized void recogerCubiertosT2()
-	{
-		try {
-			while(Mesa.getNumCubiertosT2() == 0){
-
-				wait();
-			} 
-			Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()-1);
-
-
-			tieneCubierto2 = true;
-		}
-		catch (InterruptedException e) {
-
-			e.printStackTrace();
-		}
-
-	}
-
-	public void soltar(){
-		if(tieneCubierto1== true && tieneCubierto2== false) {
-
-			Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()+1);
-			notifyAll();
-		}
-		else if(tieneCubierto1== false && tieneCubierto2 == true){
-			Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
-			notifyAll();
-		}
-	}
-	public synchronized void aTerminado() {
-		if(platosComidos== Mesa.getNumPlatos()){
-			Mesa.setComensalesTerminaron(Mesa.getComensalesTerminaron()+1);
-		}
-	}
+	
+	
 	/**
-	 *Deja sus cubiertos en el fregadero 
+	 * Deja sus cubiertos en el fregadero y espera entre 1 y 3 segundos aleatoriamente.
 	 */
 	public synchronized void dejarCubiertosFregadero() {
 		try {
@@ -139,6 +84,10 @@ public class Comensal extends Thread{
 		}
 		catch(Exception e) {}
 	}
+	
+	/**
+	 * Coge ambos cubiertos
+	 */
 	public synchronized void cogerCubiertos() {
 		try {
 			if(tieneCubierto1 == false || tieneCubierto2 == false) {
@@ -155,7 +104,8 @@ public class Comensal extends Thread{
 		}
 		catch(Exception e) {}
 	}
-	public synchronized void cogerCubiertoT1() {
+	
+	private synchronized void cogerCubiertoT1() {
 		try {
 			while(tieneCubierto1 = false) {
 				if(Mesa.getNumCubiertosT1()>0 ) {//Si hay T1, lo toma
@@ -170,7 +120,8 @@ public class Comensal extends Thread{
 		}
 		catch(Exception e) {}
 	}
-	public synchronized void cogerCubiertoT2() {
+	
+	private synchronized void cogerCubiertoT2() {
 		try {
 			while(tieneCubierto2 == false)
 			{
@@ -185,18 +136,13 @@ public class Comensal extends Thread{
 		}
 		catch(Exception e) {}
 	}
+	/**
+	 * Despierta a los demás comensales que estén dormidos.
+	 */
 	public synchronized void  despertar() {
-
 		try {
 			notifyAll();
 		}
-		catch(Exception e)
-		{
-
-		}
-
-
+		catch(Exception e){}
 	}
-
-
 }

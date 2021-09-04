@@ -1,32 +1,24 @@
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Lavaplatos extends Thread{
-
+	//---------------------------------------------------------------------------------------
+	// Atributos
+	//---------------------------------------------------------------------------------------
 	private boolean x = true;
 
-
+	//---------------------------------------------------------------------------------------
+	// Métodos
+	//---------------------------------------------------------------------------------------
 	public void run() {
 		try {
-			//			while(Mesa.getNumPlatos() != 0 ) {
-			//				if(Fregadero.getCantCubiertos()==0)
-			//					Lavaplatos.yield();
-			//				else if(Fregadero.getCantCubiertos() > 0) {
-			//					
-			//					recogerCubiertosFregadero();
-			//					lavar();
-			//					ponerCubiertosMesa();
-			//				}
-			//				sleep(10);
-			//			}
 
 			while(x) {
-				if(Mesa.getNumParCubiertosSucios()==0)
-				{
+				if(Mesa.getNumParCubiertosSucios()==0){
 					Lavaplatos.yield();
 				}
 				else if(Mesa.getComensalesTerminaron()==Mesa.getNumComensales()) {
 					x=false;
-					System.out.println("Los comensales terminaron de comer");
+					System.out.println("*****  Los comensales terminaron de comer  *****");
 				}
 				else {
 					recogerCubiertosFregadero();
@@ -35,43 +27,35 @@ public class Lavaplatos extends Thread{
 				}
 			}
 
-			/*
-			while(Mesa.getCantCubiertosSucios() > 0) {
-
-				recogerCubiertosFregadero();
-				lavar();
-				ponerCubiertosMesa();
-				while(Fregadero.getCantCubiertos() == 0) {
-					System.out.println("Lavaplatos cede fregadero.....");
-					Lavaplatos.yield(); 
-				}
-			}
-			 */
-
 		}
 		catch(Exception e) {
 
 		}
 	}
+	
+	/**
+	 * El lavaplatos recoge los cubiertos sucios del fregadero.
+	 */
 	public synchronized void recogerCubiertosFregadero() {
-		System.out.println("lavando ");
+		System.out.println("Lavando ");
 		Mesa.setNumParCubiertosSucios(Mesa.getNumParCubiertosSucios()-1);
 	}
 
-
-	public synchronized void lavar()
-	{	try {
-
-		//Tarda un tiempo aleatorio entre 1 y 2 seg
-		// nextInt is normally exclusive of the top value,
-		// so add 1 to make it inclusive
-		int randomNum = ThreadLocalRandom.current().nextInt(1, 2 + 1);
-		sleep(randomNum*1000);
-		//------------------------------------
-	}
-	catch(Exception e) {}
+	/**
+	 * El lavaplatos lava los cubiertos.
+	 */
+	public synchronized void lavar(){
+		try {
+			int randomNum = ThreadLocalRandom.current().nextInt(1, 2 + 1);
+			sleep(randomNum*1000);
+		}
+		catch(Exception e) {}
 
 	}
+	
+	/**
+	 * El lavaplatos pone los cubiertos lavados en la mesa.
+	 */
 	public synchronized void ponerCubiertosMesa() {
 
 		//Aumenta cubiertos limpios
