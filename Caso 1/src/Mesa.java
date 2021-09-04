@@ -11,9 +11,16 @@ public class Mesa {
 	private static int numPlatos;
 	private static int tamFregadero;
 	private static int numComensales;
+	private static int comensalesTerminaron=0;
 	
 	public int getComensal() {
 		return numComensales;
+	}
+	public static int getComensalesTerminaron() {
+		return comensalesTerminaron;
+	}
+	public static void setComensalesTerminaron(int comensalesTerminaron) {
+		Mesa.comensalesTerminaron = comensalesTerminaron;
 	}
 	public void setComensal(int comensal) {
 		Mesa.numComensales= comensal;
@@ -89,13 +96,13 @@ public class Mesa {
 			line = br.readLine();
 			str = line.split("= ")[1];
 			tamFregadero = Integer.parseInt(str);
-			int barrera = mitadPlatos;
+			int barrera = numComensales;
 			CyclicBarrier cb = new CyclicBarrier(barrera);
 			
 			
 			new Lavaplatos().start();
 			for(int i = 0; i < numComensales; i++) {
-				new Comensal(cb,i+1).start();
+				new Comensal(cb,i).start();
 			}
 			is.close();
 			br.close();

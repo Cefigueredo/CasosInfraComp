@@ -24,13 +24,13 @@ public class Lavaplatos extends Thread{
 				{
 					Lavaplatos.yield();
 				}
-				else if() {
-					x = false;
+				else if(Mesa.getComensalesTerminaron()==Mesa.getNumComensales()) {
+					x=false;
+					System.out.println("Los comensales terminaron de comer");
 				}
 				else {
 					recogerCubiertosFregadero();
 					lavar();
-					System.out.println("lavando " +Mesa.getNumParCubiertosSucios() + " pares de cubiertos");
 					ponerCubiertosMesa();
 				}
 			}
@@ -54,6 +54,7 @@ public class Lavaplatos extends Thread{
 		}
 	}
 	public synchronized void recogerCubiertosFregadero() {
+		System.out.println("lavando ");
 		Mesa.setNumParCubiertosSucios(Mesa.getNumParCubiertosSucios()-1);
 	}
 
@@ -77,8 +78,10 @@ public class Lavaplatos extends Thread{
 		Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()+1);
 		Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
 		//Avisa a los comensales
-		notifyAll(); System.out.println("Se ponen cubiertos en mesa");
+		notifyAll();
+		System.out.println("Se ponen cubiertos en mesa");
 
 	}
+
 
 }
