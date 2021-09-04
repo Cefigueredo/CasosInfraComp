@@ -18,7 +18,7 @@ public class Lavaplatos extends Thread{
 				}
 				else if(Mesa.getComensalesTerminaron()==Mesa.getNumComensales()) {
 					x=false;
-					System.out.println("*****  Los comensales terminaron de comer  *****");
+					System.out.println("********  Los comensales terminaron de comer  ********");
 				}
 				else {
 					recogerCubiertosFregadero();
@@ -63,7 +63,7 @@ public class Lavaplatos extends Thread{
 		Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
 		//Avisa a los comensales
 		notifyAll();
-		System.out.println("Se ponen cubiertos en mesa");
+		System.out.println("-- Se ponen cubiertos en mesa --");
 
 	}
 

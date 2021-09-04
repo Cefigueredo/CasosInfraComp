@@ -25,14 +25,14 @@ public class Comensal extends Thread{
 		try {
 			while(platosComidos != Mesa.getNumPlatos()) {
 				cogerCubiertos();
-				System.out.println("Coge Cubiertos el comensal " + id);
+				System.out.println("  Coge Cubiertos el comensal " + id);
 				comer(); 
 				dejarCubiertosFregadero();
-				System.out.println("El comensal " + id + " deja cubiertos en el fregadero" );
+				System.out.println("  El comensal " + id + " deja cubiertos en el fregadero" );
 				despertar();
 
 			}
-			System.out.println("---  El comensal " + id + " terminó la cena  ---" );
+			System.out.println("==/== El comensal " + id + " terminó la cena ==/==" );
 			Mesa.setComensalesTerminaron(Mesa.getComensalesTerminaron()+1);
 		}
 		catch(Exception e) {}
@@ -44,17 +44,15 @@ public class Comensal extends Thread{
 	public synchronized void comer(){
 		try {
 			if(platosComidos == Mesa.getMitadPlatos()) {
-				System.out.println("El comensal " + id+ " esta esperando a los demas comensales que lleguen a la mitad de los platos");
+				System.out.println(" [[El comensal " + id+ " esta esperando a los demas comensales que lleguen a la mitad de los platos]]");
 				cb.await() ;
 			}
-			System.out.println("----------------------------------------------");
-			System.out.println(" El comensal " + id + " come el plato " + platosComidos);
-			System.out.println("--------------------------------------------");
+			System.out.println(" $$$ El comensal " + id + " come el plato " + platosComidos+" $$$" );
 			int randomNum = ThreadLocalRandom.current().nextInt(3, 5 + 1);
 			sleep(randomNum*1000);
 			platosComidos ++;
 			platosFaltan = Mesa.getNumPlatos()-platosComidos;
-			System.out.println("Quedan "+ platosFaltan +" platos para que el comensal " + id +" termine la cena");
+			//System.out.println("///   Quedan "+ platosFaltan +" platos para que el comensal " + id +" termine la cena  ///");
 
 		}
 		catch(Exception e) {e.printStackTrace();}
@@ -90,6 +88,34 @@ public class Comensal extends Thread{
 	 */
 	public synchronized void cogerCubiertos() {
 		try {
+//			while(tieneCubierto1 == false||tieneCubierto2 == false) {
+//				while(tieneCubierto1 = false) {
+//					if(Mesa.getNumCubiertosT1()>0 ) {//Si hay T1, lo toma
+//						tieneCubierto1 = true;
+//						Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()-1);
+//					}
+//					else if(Mesa.getNumCubiertosT1()==0 && tieneCubierto1 == false) {//Si no hay T1, espera (pasiva)
+//						wait();
+//					}
+//				}
+//				
+//				while(tieneCubierto1 == true){
+//					long l = System.currentTimeMillis();
+//					if(System.currentTimeMillis()-l>1000) {
+//						notify();
+//						tieneCubierto1 = false; System.out.println(" ~~~~  Suelta cubierto T1 ~~~~~~~~~~~~~");
+//					}
+//					if(Mesa.getNumCubiertosT2()>0){//Si hay T2, lo toma
+//						tieneCubierto2 = true;
+//						Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()-1);
+//					}
+//					else if(Mesa.getNumCubiertosT2()==0 && tieneCubierto2 == false) {//Si no hay T2, espera (pasiva)
+//						wait();
+//					}
+//				}
+//			}
+			
+			
 			if(tieneCubierto1 == false || tieneCubierto2 == false) {
 				cogerCubiertoT1();
 				if(tieneCubierto1 == true) {
@@ -97,7 +123,7 @@ public class Comensal extends Thread{
 					cogerCubiertoT2();
 					if(System.currentTimeMillis()-l>1000) {
 						notifyAll();
-						tieneCubierto1 = false; System.out.println("Suelta cubierto T1");
+						tieneCubierto1 = false; System.out.println(" ~~~~  Suelta cubierto T1 ~~~~~~~~~~~~~");
 					}
 				}
 			}
