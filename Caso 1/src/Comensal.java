@@ -6,8 +6,10 @@ public class Comensal extends Thread{
 
 	private boolean tieneCubierto1 = false;
 	private boolean tieneCubierto2 = false;
-	private static CyclicBarrier cb;
+	private CyclicBarrier cb;
 	private int id;
+	private int platosComidos;
+	private int platosFaltan = Mesa.getMitadPlatos()-platosComidos;
 	
 	
 	
@@ -18,16 +20,14 @@ public class Comensal extends Thread{
 
 	public void run() {
 		try {
-			while(Mesa.getNumPlatos()>0) {
+			while(platosComidos != Mesa.getNumPlatos()+1) {
 				recogerCubiertosT1();
 				recogerCubiertosT2();
-				soltar();
-				System.out.println("Coge Cubiertos el comensal" + id);
+				//soltar
+				System.out.println("Coge Cubiertos el comensal " + id);
 				comer(); 
-				System.out.println("Quendan "+ Mesa.getNumPlatos() +" para que el comensal " + id +"termine la cena");
-				System.out.println("Come");
 				dejarCubiertosFregadero();
-				System.out.println("Deja cubiertos en fregadero");
+				System.out.println("El comensal " + id + " deja cubiertos en el fregadero" );
 
 			}
 		}
@@ -40,16 +40,19 @@ public class Comensal extends Thread{
 
 	public synchronized void comer(){
 		try {
-			if(Mesa.getNumPlatos() == Mesa.getMitadPlatos()) {
+			if(platosComidos == Mesa.getMitadPlatos()) {
 				cb.await() ;
 				System.out.println("Espero a otros comensales.");
 
 			}
-			System.out.println("Continuo Comiendo");
-			Mesa.setNumPlatos(Mesa.getNumPlatos()-1);
-			System.out.println("Quedan "+Mesa.getNumPlatos()+" platos.");
+			System.out.println("----------------------------------------------");
+			System.out.println(" El comensal " + id + " come el plato " + Mesa.getNumPlatos());
+			System.out.println("--------------------------------------------");
+			System.out.println("Quendan "+ platosFaltan +" platos para que el comensal " + id +" termine la cena");
 			int randomNum = ThreadLocalRandom.current().nextInt(3, 5 + 1);
 			sleep(randomNum*1000);
+			platosComidos ++;
+
 
 			/// Comer: Tardar entre 3 y 5 seg aleatoriamente
 			// nextInt is normally exclusive of the top value,
@@ -98,11 +101,11 @@ public class Comensal extends Thread{
 		if(tieneCubierto1== true && tieneCubierto2== false) {
 
 			Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()+1);
-			notify();
+			notifyAll();
 		}
 		else if(tieneCubierto1== false && tieneCubierto2 == true){
 			Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
-			notify();
+			notifyAll();
 		}
 	}
 	/**
@@ -115,12 +118,13 @@ public class Comensal extends Thread{
 			int randomNum = ThreadLocalRandom.current().nextInt(1, 3 + 1);
 			sleep(randomNum*1000);
 
-			while( Mesa.getCantCubiertosSucios() > Mesa.getTamFregadero()) {
+			while( Mesa.getNumParCubiertosSucios() > Mesa.getTamFregadero()) {
 				System.out.println("Esperar que el fregadero se desocupe");
 				Comensal.yield();
 			}
-			Mesa.setNumCubiertosSuciosT1(Mesa.getNumCubiertosSuciosT1()+1);
-			Mesa.setNumCubiertosSuciosT2(Mesa.getNumCubiertosSuciosT2()+1);
+
+			Mesa.setNumParCubiertosSucios(Mesa.getNumParCubiertosSucios()+1);
+			
 			//Deja 1 par de  cubiertos en el fregadero
 			//Ya no tiene cubiertos
 			tieneCubierto1 = false;

@@ -2,6 +2,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Lavaplatos extends Thread{
 
+	private boolean x = true;
+
 
 	public void run() {
 		try {
@@ -17,13 +19,22 @@ public class Lavaplatos extends Thread{
 			//				sleep(10);
 			//			}
 
-			while(Mesa.getCantCubiertosSucios()>0) {
-				recogerCubiertosFregadero();
-				lavar();
-				System.out.println("lavando " + Mesa.getCantCubiertosSucios() + "cubiertos, de los cuales " +Mesa.getNumCubiertosSuciosT1()+ " son de T1 y "+ Mesa.getNumCubiertosSuciosT2() +" son de T2");
-				ponerCubiertosMesa();
+			while(x) {
+				if(Mesa.getNumParCubiertosSucios()==0)
+				{
+					Lavaplatos.yield();
+				}
+				else if() {
+					x = false;
+				}
+				else {
+					recogerCubiertosFregadero();
+					lavar();
+					System.out.println("lavando " +Mesa.getNumParCubiertosSucios() + " pares de cubiertos");
+					ponerCubiertosMesa();
+				}
 			}
-			Lavaplatos.yield();
+
 			/*
 			while(Mesa.getCantCubiertosSucios() > 0) {
 
@@ -43,7 +54,7 @@ public class Lavaplatos extends Thread{
 		}
 	}
 	public synchronized void recogerCubiertosFregadero() {
-		Mesa.setCantCubiertosSucios(Mesa.getCantCubiertosSucios()-1);
+		Mesa.setNumParCubiertosSucios(Mesa.getNumParCubiertosSucios()-1);
 	}
 
 
@@ -61,9 +72,7 @@ public class Lavaplatos extends Thread{
 
 	}
 	public synchronized void ponerCubiertosMesa() {
-		//Reduce cubiertos sucios
-		Mesa.setNumCubiertosSuciosT1(Mesa.getNumCubiertosSuciosT1()-1);
-		Mesa.setNumCubiertosSuciosT2(Mesa.getNumCubiertosSuciosT2()-1);
+
 		//Aumenta cubiertos limpios
 		Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()+1);
 		Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
