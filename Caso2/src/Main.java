@@ -30,7 +30,7 @@ public class Main {
 				tuple = line.split(",");
 				instruc[i][0] = tuple[0];
 				instruc[i][1] = tuple[1];
-				i++;				
+				i++;
 			}
 			
 			System.out.println(i);
