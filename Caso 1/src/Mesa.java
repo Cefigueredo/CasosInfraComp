@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.CyclicBarrier;
 
 public class Mesa {
@@ -15,6 +17,8 @@ public class Mesa {
 	private static int numComensales;
 	private static int comensalesTerminaron=0;
 	private static int mitadPlatos;
+	private static ArrayList<Comensal> comensales = new ArrayList<Comensal>();
+	private static Lavaplatos lp;
 	
 	//---------------------------------------------------------------------------------------
 	// Métodos
@@ -52,10 +56,15 @@ public class Mesa {
 			CyclicBarrier cb = new CyclicBarrier(barrera);
 			
 			
-			new Lavaplatos().start();
+			
 			for(int i = 0; i < numComensales; i++) {
-				new Comensal(cb,i).start();
+				Comensal cm = new Comensal(cb,i);
+				cm.start();
+				comensales.add(cm);
 			}
+			Lavaplatos lavap = new Lavaplatos(comensales);
+			lavap.start();
+			lp = lavap;
 			is.close();
 			br.close();
 			
@@ -63,6 +72,16 @@ public class Mesa {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+
+	public static Lavaplatos getLp() {
+		return lp;
+	}
+
+
+	public static void setLp(Lavaplatos lp) {
+		Mesa.lp = lp;
 	}
 
 

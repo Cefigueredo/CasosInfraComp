@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Lavaplatos extends Thread{
@@ -5,10 +6,18 @@ public class Lavaplatos extends Thread{
 	// Atributos
 	//---------------------------------------------------------------------------------------
 	private boolean x = true;
-
+	private static ArrayList<Comensal> comensales = new ArrayList<Comensal>();
+	private static ArrayList<Boolean> comenBarrera= new ArrayList<Boolean>();
 	//---------------------------------------------------------------------------------------
 	// Métodos
 	//---------------------------------------------------------------------------------------
+	public Lavaplatos(ArrayList<Comensal> comensales) {
+		this.comensales = comensales;
+		for(int i = 0; i < comensales.size(); i++) {
+			comenBarrera.add(false);
+		}
+	}
+	
 	public void run() {
 		try {
 
@@ -59,12 +68,35 @@ public class Lavaplatos extends Thread{
 	public synchronized void ponerCubiertosMesa() {
 
 		//Aumenta cubiertos limpios
-		Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()+1);
-		Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
+		synchronized(this) {
+			Mesa.setNumCubiertosT1(Mesa.getNumCubiertosT1()+1);
+			Mesa.setNumCubiertosT2(Mesa.getNumCubiertosT2()+1);
+		}
+		
 		//Avisa a los comensales
-		notifyAll();
+		
+			try {
+				for(int i = 0; i < comensales.size(); i++) {
+					if(comenBarrera.get(i)==false) {
+						comensales.get(i).despertar();
+					}
+				}
+			}
+			catch(Exception e) {}
+		
+		//Cómo se hace para que una clase A, que extiende de Thread, pueda realizar un notifyAll() para despertar los threads de una clase B que recibieron wait()?
+		
+		
 		System.out.println("-- Se ponen cubiertos en mesa --");
 
+	}
+
+	public static ArrayList<Boolean> getComenBarrera() {
+		return comenBarrera;
+	}
+
+	public static void setComenBarrera(ArrayList<Boolean> comenBarrera) {
+		Lavaplatos.comenBarrera = comenBarrera;
 	}
 
 
