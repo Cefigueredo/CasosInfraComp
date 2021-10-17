@@ -37,7 +37,12 @@ public class Main {
 				tRef[k] = 0;
 				tMod[k] = 0;
 			}
-
+			
+			for(int k = 0; k < numeroPaginasDelProceso; k++) {
+				tp[k] = k;
+				tRef[k] = 0;
+				tMod[k] = 0;
+			}
 			//En cada fila de instruc, en la primera columna pone la referencia y en la segunda pone el tipo de referencia (r,m)
 			int i = 0;
 			String[][] instruc = new String[numeroReferenciasEnArchivo][2];
