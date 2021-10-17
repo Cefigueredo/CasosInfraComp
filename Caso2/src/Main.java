@@ -6,9 +6,13 @@ import java.util.concurrent.CyclicBarrier;
 
 public class Main {
 	
-	private static ArrayList<Integer> mp = new ArrayList<>();
-	private static ArrayList<Integer> tp = new ArrayList<>();
 	
+	private static int[] mp;
+	private static int[] tp;
+	private static int[] tRef;
+	private static int[] tMod;
+	private int refActual = 0;
+	private String tipoRefActual = "";
 	public static void main(String[] args) throws Exception{
 		try { //Se recibe la lectura de consola
 			InputStreamReader is= new InputStreamReader(System.in);
@@ -21,17 +25,18 @@ public class Main {
 			line = br.readLine();
 			int numeroPaginasDelProceso = Integer.parseInt(line);
 			line = br.readLine();
-			int numeroReferenciasEnArchivo = Integer.parseInt(line);
+			int numeroReferenciasEnArchivo = Integer.parseInt(line);	
+			
+			mp = new int[numeroMarcosPagina];
+			tp = new int[numeroPaginasDelProceso];
+			tRef = new int[numeroPaginasDelProceso];
+			tMod = new int[numeroPaginasDelProceso];
 			
 			for(int k = 0; k < numeroMarcosPagina; k++) {
-				mp.add(-1);
+				mp[k] = -1;
+				tRef[k] = 0;
+				tMod[k] = 0;
 			}
-			
-			for(int k = 0; k < numeroPaginasDelProceso; k++) {
-				tp.add(-1);
-			}
-			
-			ArrayList<String> c = new ArrayList<>();
 
 			//En cada fila de instruc, en la primera columna pone la referencia y en la segunda pone el tipo de referencia (r,m)
 			int i = 0;
@@ -51,14 +56,9 @@ public class Main {
 			rm.start();
 			
 			for(int k = 0; k < instruc.length; k++) {
-				if(instruc[k][0].equals("0")) {
-					
-				}
+				tpmp.setRef(Integer.parseInt(instruc[k][0]), instruc[k][1]);
 			}
-			
-			
-			
-			
+
 
 			is.close();
 			br.close();
@@ -69,19 +69,19 @@ public class Main {
 		}
 	}
 
-	public static ArrayList<Integer> getMp() {
+	public static int[] getMp() {
 		return mp;
 	}
 
-	public static void setMp(ArrayList<Integer> mp) {
+	public static void setMp(int[] mp) {
 		Main.mp = mp;
 	}
 
-	public static ArrayList<Integer> getTp() {
+	public static int[] getTp() {
 		return tp;
 	}
 
-	public static void setTp(ArrayList<Integer> tp) {
+	public static void setTp(int[] tp) {
 		Main.tp = tp;
 	}
  
