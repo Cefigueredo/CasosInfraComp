@@ -4,8 +4,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.CyclicBarrier;
-
 
 
 public class Main {
@@ -16,7 +14,7 @@ public class Main {
 	private static int referencias;
 	private static Hashtable<Integer, List<Integer>> valoresTabla;
 	private static String[][] instruc ;
-	private int numFallosPag;
+	private static int numFallosPag;
 	public static void main(String[] args) throws Exception{
 		try { //Se recibe la lectura de consola
 			InputStreamReader is= new InputStreamReader(System.in);
@@ -64,6 +62,7 @@ public class Main {
 
 			for(int k = 0; k < instruc.length; k++) {
 				tpmp.setRef(Integer.parseInt(instruc[k][0]), instruc[k][1]);
+				rm.actualizarRM(Integer.parseInt(instruc[k][0]), instruc[k][1]);
 			}
 
 
@@ -74,6 +73,22 @@ public class Main {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static Hashtable<Integer, List<Integer>> getValoresTabla() {
+		return valoresTabla;
+	}
+
+	public static void setValoresTabla(Hashtable<Integer, List<Integer>> valoresTabla) {
+		Main.valoresTabla = valoresTabla;
+	}
+
+	public static int getNumFallosPag() {
+		return numFallosPag;
+	}
+
+	public static void setNumFallosPag(int numFallosPag) {
+		Main.numFallosPag = numFallosPag;
 	}
 
 	public static String[][] getInstruc() {
