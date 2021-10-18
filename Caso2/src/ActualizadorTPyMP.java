@@ -19,7 +19,6 @@ public class ActualizadorTPyMP extends Thread{
 			List<Integer> posiciones = new ArrayList<Integer>();
 			for(int i =0;i< Main.getInstruc().length;i++) {
 				cargarUnaReferencia(i,posiciones);
-				Main.setValoresTabla(valoresTabla);
 				sleep(1);
 			}
 			ActualizadorRM.setCorre(false);
@@ -119,6 +118,7 @@ public class ActualizadorTPyMP extends Thread{
 			Main.setNumFallosPag(Main.getNumFallosPag()+1);
 		}
 
+		Main.setValoresTabla(valoresTabla);
 	}
 
 }
