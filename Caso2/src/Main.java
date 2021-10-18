@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -10,14 +9,13 @@ import java.util.List;
 
 public class Main {
 
-
 	private static int mp;
 	private static int tp;
 	private static int referencias;
 	private static Hashtable<Integer, List<Integer>> valoresTabla;
 	private static String[][] instruc ;
 	private static int numFallosPag=0;
-
+	
 
 	public static void main(String[] args) throws Exception{
 		try {
@@ -57,14 +55,14 @@ public class Main {
 				i++;
 			}
 
-			ActualizadorTPyMP tpmp = new ActualizadorTPyMP();
-			tpmp.start();
+			//Inicializa y corre los threads
 			ActualizadorRM rm = new ActualizadorRM();
 			rm.start();
-			rm.cleanR();
-			br.close();
+			ActualizadorTPyMP tpmp = new ActualizadorTPyMP();
+			tpmp.start();
 			
-
+			
+			br.close();
 		}
 		catch (IOException e) {
 			e.printStackTrace();

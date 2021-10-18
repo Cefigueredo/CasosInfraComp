@@ -1,4 +1,3 @@
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashSet;
@@ -17,6 +16,7 @@ public class ActualizadorTPyMP extends Thread{
 			hashControl = new HashSet<>();
 			valoresTabla = Main.getValoresTabla();
 			List<Integer> posiciones = new ArrayList<Integer>();
+			ActualizadorRM.setInicio(true);
 			for(int i =0;i< Main.getInstruc().length;i++) {
 				cargarUnaReferencia(i,posiciones);
 				sleep(1);

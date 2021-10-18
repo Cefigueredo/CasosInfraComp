@@ -1,31 +1,12 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-
 
 public class ActualizadorRM extends Thread{
 	
-	private Queue<Integer> pagVirtual = new ArrayDeque<>();
-	private Queue<String> tipo = new ArrayDeque<>();
-	private boolean inicio = false;
-	public boolean isInicio() {
-		return inicio;
-	}
-
-	public void setInicio(boolean inicio) {
-		this.inicio = inicio;
-	}
-
-	public static boolean isCorre() {
-		return corre;
-	}
-
-	public static void setCorre(boolean corre) {
-		ActualizadorRM.corre = corre;
-	}
-
+	private static boolean inicio = false;
 	private static boolean corre = true;
+	
 	public void run() {
 		try {
 			while(corre) {
@@ -33,16 +14,13 @@ public class ActualizadorRM extends Thread{
 					cleanR();
 				}
 				sleep(20);
-			}
-			
-			
-			
+			}	
 		}
 		catch(Exception e) {}
 	}
 	
 	public synchronized void cleanR() {
-		inicio = true;
+
 		for(int i = 0; i < Main.getValoresTabla().size(); i++) {
 			
 			
@@ -61,6 +39,22 @@ public class ActualizadorRM extends Thread{
 				Main.getValoresTabla().put(i, rm2);
 			}
 		}
+	}
+	
+	public static boolean isInicio() {
+		return inicio;
+	}
+
+	public static void setInicio(boolean inicio) {
+		ActualizadorRM.inicio = inicio;
+	}
+
+	public static boolean isCorre() {
+		return corre;
+	}
+
+	public static void setCorre(boolean corre) {
+		ActualizadorRM.corre = corre;
 	}
 	
 }
