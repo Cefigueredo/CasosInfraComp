@@ -9,10 +9,26 @@ public class ActualizadorRM extends Thread{
 	private Queue<Integer> pagVirtual = new ArrayDeque<>();
 	private Queue<String> tipo = new ArrayDeque<>();
 	private boolean inicio = false;
-	
+	public boolean isInicio() {
+		return inicio;
+	}
+
+	public void setInicio(boolean inicio) {
+		this.inicio = inicio;
+	}
+
+	public static boolean isCorre() {
+		return corre;
+	}
+
+	public static void setCorre(boolean corre) {
+		ActualizadorRM.corre = corre;
+	}
+
+	private static boolean corre = true;
 	public void run() {
 		try {
-			while(true) {
+			while(corre) {
 				if(inicio) {
 					cleanR();
 				}

@@ -41,12 +41,10 @@ public class Main {
 			valoresIniciales.add(-1);
 			valoresIniciales.add(0);
 			valoresIniciales.add(0);
-			System.out.println(valoresIniciales);
 
 			for(int k = 0; k < numeroPaginasDelProceso; k++) {
 				valoresTabla.put(k,valoresIniciales);
 			}
-			System.out.println(valoresTabla);
 			//En cada fila de instruc, en la primera columna pone la referencia y en la segunda pone el tipo de referencia (r,m)
 			int i = 0;
 			instruc= new String[numeroReferenciasEnArchivo][2];

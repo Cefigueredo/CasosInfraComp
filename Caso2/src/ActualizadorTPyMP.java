@@ -22,6 +22,7 @@ public class ActualizadorTPyMP extends Thread{
 				Main.setValoresTabla(valoresTabla);
 				sleep(1);
 			}
+			ActualizadorRM.setCorre(false);
 			System.out.println("==================================");
 			System.out.println("Num fallos de pag :" + Main.getNumFallosPag());
 			System.out.println("\n");
