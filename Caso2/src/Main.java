@@ -4,20 +4,19 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.CyclicBarrier;
-
 
 
 public class Main {
-	
-	
+
+
 	private static int mp;
 	private static int tp;
 	private static int referencias;
 	private static Hashtable<Integer, List<Integer>> valoresTabla;
 	private static String[][] instruc ;
 	private static int numFallosPag=0;
-	
+
+
 	public static void main(String[] args) throws Exception{
 		try { //Se recibe la lectura de consola
 			InputStreamReader is= new InputStreamReader(System.in);
@@ -31,7 +30,7 @@ public class Main {
 			int numeroPaginasDelProceso = Integer.parseInt(line);
 			line = br.readLine();
 			int numeroReferenciasEnArchivo = Integer.parseInt(line);
-			
+
 			mp = numeroMarcosPagina;
 			tp = numeroPaginasDelProceso;
 			referencias = numeroReferenciasEnArchivo;
@@ -41,7 +40,7 @@ public class Main {
 			valoresIniciales.add(0);
 			valoresIniciales.add(0);
 			System.out.println(valoresIniciales);
-			
+
 			for(int k = 0; k < numeroPaginasDelProceso; k++) {
 				valoresTabla.put(k,valoresIniciales);
 			}
@@ -57,13 +56,12 @@ public class Main {
 				instruc[i][1] = tuple[1];
 				i++;
 			}
-			
+
 			ActualizadorTPyMP tpmp = new ActualizadorTPyMP();
 			tpmp.start();
 			ActualizadorRM rm = new ActualizadorRM();
 			rm.start();
 
-			System.out.println(numFallosPag);
 			is.close();
 			br.close();
 
@@ -120,5 +118,5 @@ public class Main {
 	public static void setReferencias(int referencias) {
 		Main.referencias = referencias;
 	}
- 
+
 }
