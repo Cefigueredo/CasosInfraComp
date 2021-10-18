@@ -17,66 +17,98 @@ public class ActualizadorTPyMP extends Thread{
 
 	public void run() {
 		try {
-			cargarUnaReferencia();
+			hashControl = new HashSet<>();
+			valoresTabla = Main.getValoresTabla();
+			List<Integer> posiciones = new ArrayList<Integer>();
+			for(int i =0;i< Main.getInstruc().length;i++) {
+				cargarUnaReferencia(i,posiciones);
+				sleep(1);
+			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	public synchronized void  cargarUnaReferencia() throws InterruptedException {
-		hashControl = new HashSet<>();
-		valoresTabla = Main.getValoresTabla();
-		List<Integer> posiciones = new ArrayList<Integer>();
-		for(int i =0;i< Main.getInstruc().length;i++) {
-			boolean falloPag = false;
-			List<Integer> valoresTp = new ArrayList<Integer>();
-			String[][] referenciaActual = Main.getInstruc();
-			int numReferencian = Integer.parseInt(referenciaActual[i][0]);
-			if (!hashControl.contains(numReferencian)) {
-				falloPag = true;
-				if(cola.size()== Main.getMp()) {
-					int last = cola.removeLast();
-					hashControl.remove(last);
-					valoresTp.add(-1);
-					valoresTp.add(1);
-					valoresTp.add(0);
-					valoresTabla.put(last,valoresTp );
-					posiciones.set(posiciones.indexOf(last), -1);
-				}
-				posiciones.add(numReferencian);
-			}
-			else {
-				cola.remove(numReferencian);
-			}
-			int pos = posiciones.indexOf(-1);
-			if(pos >=0) {
-				posiciones.remove(posiciones.size()-1);
-				posiciones.set(pos, numReferencian);
-			}
-			cola.push(numReferencian);
-			hashControl.add(numReferencian);
-			int counter = 0;
-			for (Integer number : posiciones) {
-				if (number == numReferencian) {
-					break;
-				}
-				else counter++;
-			}
+	public synchronized void  cargarUnaReferencia(int i,List<Integer> posiciones) throws InterruptedException {
+		boolean falloPag = false;
+		List<Integer> valoresTp = new ArrayList<Integer>();
+		String[][] referenciaActual = Main.getInstruc();
+		int numReferencian = Integer.parseInt(referenciaActual[i][0]);
+		String estadoActual = referenciaActual[i][1];
 
-			if(falloPag == true) {
+		if (!hashControl.contains(numReferencian) ) {
+			falloPag = true;
+			if(cola.size()== Main.getMp()) {
+				int last = cola.removeLast();
+				hashControl.remove(last);
+				valoresTp.add(-1);
+				valoresTp.add(0);
+				valoresTp.add(0);
+				valoresTabla.put(last,valoresTp );
+				posiciones.set(posiciones.indexOf(last), -1);
+			}
+			posiciones.add(numReferencian);
+
+		}
+		else {
+			List<Integer> referenciado = valoresTabla.get(numReferencian);
+			List<Integer> teniaBitR =  new ArrayList<Integer>();
+			teniaBitR.add(referenciado.get(0));
+			teniaBitR.add(1);
+			teniaBitR.add(0);
+			
+			if(referenciado.equals(teniaBitR) && estadoActual.equals("m")) {
+				valoresTp = new ArrayList<Integer>();
+				valoresTp.add(referenciado.get(0));
+				valoresTp.add(1);
+				valoresTp.add(1);
+				valoresTabla.put(numReferencian,valoresTp);
+				Main.setNumFallosPag(Main.getNumFallosPag()+1);
+			}
+			cola.remove(numReferencian);
+		}
+
+		cola.push(numReferencian);
+		hashControl.add(numReferencian);
+
+		int counter = 0;	
+		int pos = posiciones.indexOf(-1);
+		if(pos >=0) {
+			posiciones.remove(posiciones.size()-1);
+			posiciones.set(pos, numReferencian);
+		}
+
+		for (Integer number : posiciones) {
+			if (number == numReferencian) {
+				break;
+			}
+			else counter++;
+		}
+
+
+		if(falloPag == true) {
+			if(estadoActual.equals("r")) {
 				valoresTp = new ArrayList<Integer>();
 				valoresTp.add(counter);
 				valoresTp.add(1);
 				valoresTp.add(0);
-				valoresTabla.put(numReferencian,valoresTp);
-				Main.setNumFallosPag(Main.getNumFallosPag()+1);
 			}
-			System.out.println(posiciones.size());
-			System.out.println(Main.getNumFallosPag());
+			else {
+				valoresTp = new ArrayList<Integer>();
+				valoresTp.add(counter);
+				valoresTp.add(1);
+				valoresTp.add(1);
+			}
 
-
-			sleep(1);
+			valoresTabla.put(numReferencian,valoresTp);
+			Main.setNumFallosPag(Main.getNumFallosPag()+1);
 		}
+		System.out.println(posiciones.size());
+		System.out.println("==================================");
+		System.out.println("Num fallos de pag :" + Main.getNumFallosPag());
+		System.out.println("\n");
+
 	}
+
 }
 
