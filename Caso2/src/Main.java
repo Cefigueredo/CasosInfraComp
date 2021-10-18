@@ -16,7 +16,8 @@ public class Main {
 	private static int referencias;
 	private static Hashtable<Integer, List<Integer>> valoresTabla;
 	private static String[][] instruc ;
-	private int numFallosPag;
+	private static int numFallosPag=0;
+	
 	public static void main(String[] args) throws Exception{
 		try { //Se recibe la lectura de consola
 			InputStreamReader is= new InputStreamReader(System.in);
@@ -62,11 +63,7 @@ public class Main {
 			ActualizadorRM rm = new ActualizadorRM();
 			rm.start();
 
-			for(int k = 0; k < instruc.length; k++) {
-				tpmp.setRef(Integer.parseInt(instruc[k][0]), instruc[k][1]);
-			}
-
-
+			System.out.println(numFallosPag);
 			is.close();
 			br.close();
 
@@ -84,12 +81,28 @@ public class Main {
 		Main.instruc = instruc;
 	}
 
-	public  int getMp() {
+	public static  int getMp() {
 		return mp;
 	}
 
-	public  void setMp(int mp) {
-		this.mp = mp;
+	public static  void setMp(int mp) {
+		Main.mp = mp;
+	}
+
+	public static Hashtable<Integer, List<Integer>> getValoresTabla() {
+		return valoresTabla;
+	}
+
+	public static void setValoresTabla(Hashtable<Integer, List<Integer>> valoresTabla) {
+		Main.valoresTabla = valoresTabla;
+	}
+
+	public static int getNumFallosPag() {
+		return numFallosPag;
+	}
+
+	public  static void setNumFallosPag(int numFallosPag) {
+		Main.numFallosPag = numFallosPag;
 	}
 
 	public static int getTp() {
