@@ -63,7 +63,7 @@ public class Main {
 			tpmp.start();
 			ActualizadorRM rm = new ActualizadorRM();
 			rm.start();
-
+			rm.cleanR();
 			br.close();
 
 		}
