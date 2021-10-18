@@ -5,13 +5,10 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 public class ActualizadorTPyMP extends Thread{
 
 	private Deque<Integer> cola = new LinkedList<>();
-	private Queue<Integer> ref = new ArrayDeque<Integer>();
-	private Queue<String> tipoRef = new ArrayDeque<String>();
 	private  Hashtable<Integer, List<Integer>> valoresTabla;
 	private HashSet<Integer> hashControl;
 
@@ -22,8 +19,12 @@ public class ActualizadorTPyMP extends Thread{
 			List<Integer> posiciones = new ArrayList<Integer>();
 			for(int i =0;i< Main.getInstruc().length;i++) {
 				cargarUnaReferencia(i,posiciones);
+				Main.setValoresTabla(valoresTabla);
 				sleep(1);
 			}
+			System.out.println("==================================");
+			System.out.println("Num fallos de pag :" + Main.getNumFallosPag());
+			System.out.println("\n");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -41,9 +42,22 @@ public class ActualizadorTPyMP extends Thread{
 			if(cola.size()== Main.getMp()) {
 				int last = cola.removeLast();
 				hashControl.remove(last);
-				valoresTp.add(-1);
-				valoresTp.add(0);
-				valoresTp.add(0);
+				List<Integer> referenciado = valoresTabla.get(last);
+				List<Integer> teniaBitM =  new ArrayList<Integer>();
+				teniaBitM.add(referenciado.get(0));
+				teniaBitM.add(1);
+				teniaBitM.add(0);
+				if(referenciado.equals(teniaBitM)) {
+					valoresTp.add(-1);
+					valoresTp.add(0);
+					valoresTp.add(1);
+				}
+				else {
+					valoresTp.add(-1);
+					valoresTp.add(0);
+					valoresTp.add(0);
+				}
+
 				valoresTabla.put(last,valoresTp );
 				posiciones.set(posiciones.indexOf(last), -1);
 			}
@@ -103,10 +117,6 @@ public class ActualizadorTPyMP extends Thread{
 			valoresTabla.put(numReferencian,valoresTp);
 			Main.setNumFallosPag(Main.getNumFallosPag()+1);
 		}
-		System.out.println(posiciones.size());
-		System.out.println("==================================");
-		System.out.println("Num fallos de pag :" + Main.getNumFallosPag());
-		System.out.println("\n");
 
 	}
 

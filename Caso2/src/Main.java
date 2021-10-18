@@ -21,7 +21,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception{
 		try {
-			File file = new File("./referencias8_16_75.txt"); //Archivo a leer
+			File file = new File("./referencias8_32_75.txt"); //Archivo a leer
 			BufferedReader br = new BufferedReader(new FileReader(file));
 
 			String line = br.readLine();
@@ -65,6 +65,7 @@ public class Main {
 			rm.start();
 			rm.cleanR();
 			br.close();
+			
 
 		}
 		catch (IOException e) {
