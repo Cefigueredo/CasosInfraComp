@@ -80,12 +80,12 @@ public class ActualizadorRM extends Thread{
 					
 					if(Main.getValoresTabla().contains(noRnoM)||Main.getValoresTabla().get(i).get(0)==-1) {
 						Main.getValoresTabla().put(i, valoresIniciales);
-						Main.setNumFallosPag(Main.getNumFallosPag()+1);
+						aumentarFallosEn1();
 						i=Main.getValoresTabla().size();
 					}
 					else if(Main.getValoresTabla().contains(noRM)) {
 						Main.getValoresTabla().put(i, rm);
-						Main.setNumFallosPag(Main.getNumFallosPag()+1);
+						aumentarFallosEn1();
 						i=Main.getValoresTabla().size();
 					}
 					i=Main.getValoresTabla().size();
@@ -134,12 +134,12 @@ public class ActualizadorRM extends Thread{
 				if(Main.getValoresTabla().get(i).get(0)==valoresIniciales.get(0) ||Main.getValoresTabla().get(i).get(0)==-1) {
 					if(Main.getValoresTabla().contains(noRnoM)||Main.getValoresTabla().get(i).get(0)==-1) {
 						Main.getValoresTabla().put(i, valoresIniciales);
-						Main.setNumFallosPag(Main.getNumFallosPag()+1);
+						aumentarFallosEn1();
 						i=Main.getValoresTabla().size();
 					}
 					else if(Main.getValoresTabla().contains(rnoM)) {
 						Main.getValoresTabla().put(i, rm);
-						Main.setNumFallosPag(Main.getNumFallosPag()+1);
+						aumentarFallosEn1();
 						i=Main.getValoresTabla().size();
 					}
 					i=Main.getValoresTabla().size();
@@ -149,5 +149,10 @@ public class ActualizadorRM extends Thread{
 			pagVirtual.poll();
 			
 		}
+	}
+	
+	
+	public synchronized void aumentarFallosEn1() {
+		Main.setNumFallosPag(Main.getNumFallosPag()+1);
 	}
 }
