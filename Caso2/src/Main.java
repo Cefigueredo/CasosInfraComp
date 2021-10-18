@@ -2,17 +2,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.CyclicBarrier;
+
+
 
 public class Main {
 	
 	
-	private static int[] mp;
-	private static int[] tp;
-	private static int[] tRef;
-	private static int[] tMod;
-	private int refActual = 0;
-	private String tipoRefActual = "";
+	private static int mp;
+	private static int tp;
+	private static int referencias;
+	private static Hashtable<Integer, List<Integer>> valoresTabla;
+	private static String[][] instruc ;
+	private int numFallosPag;
 	public static void main(String[] args) throws Exception{
 		try { //Se recibe la lectura de consola
 			InputStreamReader is= new InputStreamReader(System.in);
@@ -25,27 +29,25 @@ public class Main {
 			line = br.readLine();
 			int numeroPaginasDelProceso = Integer.parseInt(line);
 			line = br.readLine();
-			int numeroReferenciasEnArchivo = Integer.parseInt(line);	
+			int numeroReferenciasEnArchivo = Integer.parseInt(line);
 			
-			mp = new int[numeroMarcosPagina];
-			tp = new int[numeroPaginasDelProceso];
-			tRef = new int[numeroPaginasDelProceso];
-			tMod = new int[numeroPaginasDelProceso];
-			
-			for(int k = 0; k < numeroMarcosPagina; k++) {
-				mp[k] = -1;
-				tRef[k] = 0;
-				tMod[k] = 0;
-			}
+			mp = numeroMarcosPagina;
+			tp = numeroPaginasDelProceso;
+			referencias = numeroReferenciasEnArchivo;
+			valoresTabla = new Hashtable<>();
+			List<Integer> valoresIniciales = new ArrayList<Integer>();
+			valoresIniciales.add(-1);
+			valoresIniciales.add(0);
+			valoresIniciales.add(0);
+			System.out.println(valoresIniciales);
 			
 			for(int k = 0; k < numeroPaginasDelProceso; k++) {
-				tp[k] = k;
-				tRef[k] = 0;
-				tMod[k] = 0;
+				valoresTabla.put(k,valoresIniciales);
 			}
+			System.out.println(valoresTabla);
 			//En cada fila de instruc, en la primera columna pone la referencia y en la segunda pone el tipo de referencia (r,m)
 			int i = 0;
-			String[][] instruc = new String[numeroReferenciasEnArchivo][2];
+			instruc= new String[numeroReferenciasEnArchivo][2];
 			while(line!=null && line.length()>0 && !"".equals(line) && i < numeroReferenciasEnArchivo) {
 				line = br.readLine();
 				String[] tuple = new String[2];
@@ -59,7 +61,7 @@ public class Main {
 			tpmp.start();
 			ActualizadorRM rm = new ActualizadorRM();
 			rm.start();
-			
+
 			for(int k = 0; k < instruc.length; k++) {
 				tpmp.setRef(Integer.parseInt(instruc[k][0]), instruc[k][1]);
 			}
@@ -74,20 +76,36 @@ public class Main {
 		}
 	}
 
-	public static int[] getMp() {
+	public static String[][] getInstruc() {
+		return instruc;
+	}
+
+	public static void setInstruc(String[][] instruc) {
+		Main.instruc = instruc;
+	}
+
+	public  int getMp() {
 		return mp;
 	}
 
-	public static void setMp(int[] mp) {
-		Main.mp = mp;
+	public  void setMp(int mp) {
+		this.mp = mp;
 	}
 
-	public static int[] getTp() {
+	public static int getTp() {
 		return tp;
 	}
 
-	public static void setTp(int[] tp) {
+	public static void setTp(int tp) {
 		Main.tp = tp;
+	}
+
+	public static int getReferencias() {
+		return referencias;
+	}
+
+	public static void setReferencias(int referencias) {
+		Main.referencias = referencias;
 	}
  
 }
