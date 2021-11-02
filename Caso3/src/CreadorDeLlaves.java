@@ -16,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @author Carlos
  *
  */
+//LLave simétrica
 public class CreadorDeLlaves {
 
 
