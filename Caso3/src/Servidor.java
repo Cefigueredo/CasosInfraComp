@@ -12,9 +12,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
+import Auxiliares.Asimetrico;
 import Auxiliares.Simetrico;
 
 public class Servidor extends Thread{
@@ -97,10 +100,63 @@ public class Servidor extends Thread{
 				}
 			}
 			else if(tipoCifrado == 2) {
-				
+				ServerSocket servidor = new ServerSocket(SERVER_PORT+id);
+				while(centinela) {
+					
+					//Recibe desde el repetidor
+					Socket misocket = servidor.accept();
+					DataInputStream dis = new DataInputStream(misocket.getInputStream());
+					String mensajetexto = dis.readUTF();
+					System.out.println("Llega al servidor "+id+": "+mensajetexto);
+					dis.close();
+					misocket.close();
+					
+					//Descifra mensaje de repetidor
+					File f = new File("llavesAsimetricas/K_S"+id+"-");
+					FileInputStream fis = new FileInputStream(f);
+					Key key;
+					ObjectInputStream oin = new ObjectInputStream(fis);
+					key = (Key) oin.readObject();
+					fis.close();
+					oin.close();
+					PrivateKey prk = (PrivateKey) key;
+					Asimetrico asm = new Asimetrico();
+					byte[] mensajeEnBytes = asm.str2byte(mensajetexto);
+					byte[] mensajeDescifrado = asm.descifrarConPrivada(mensajeEnBytes, prk);
+					String mensajeDescifradoString = new String(mensajeDescifrado);
+					
+					
+					//Cifrar el archivo para enviar
+					File obj = new File("mensajes/"+mensajeDescifradoString+".txt");
+					FileReader reader = new FileReader(obj);
+					BufferedReader br = new BufferedReader(reader);
+					String mensajeAEnviar = br.readLine();
+					
+					
+					f = new File("llavesAsimetricas/K_R"+id+"+");
+					fis = new FileInputStream(f);
+					oin = new ObjectInputStream(fis);
+					key = (Key) oin.readObject();
+					fis.close();
+					oin.close();
+					PublicKey pub= (PublicKey) key;
+					byte[] servidorCifrando = asm.cifrarConPublica(mensajeAEnviar, pub);
+					String servidorCifradoString = asm.byte2str(servidorCifrando);
+					
+					//Envía al repetidor
+					Socket enviarRepetidor= new Socket(SERVER, REP_PORT+id);
+					DataOutputStream oos = new DataOutputStream(enviarRepetidor.getOutputStream());
+					oos.writeUTF(servidorCifradoString);
+					enviarRepetidor.close();
+					System.out.println("Servidor "+id+" envía: "+servidorCifradoString);
+					misocket.close();
+				}
 			}
 			
 		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

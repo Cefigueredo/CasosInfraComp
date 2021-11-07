@@ -32,7 +32,7 @@ public class Main {
 		else if(nTipoCifrado==2) {//Generando llaves asimétricas
 			System.out.println("Usted eligió cifrado asimétrico");
 			System.out.println("Generando llaves asimétricas...");
-			new GeneradorLLavesAsimetricas(1024).generarLLaves(cantidadClientes);
+			new GeneradorLLavesAsimetricas().generarLLaves(cantidadClientes);
 		}
 		else {
 			System.out.println("Error");

@@ -8,9 +8,12 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
+import Auxiliares.Asimetrico;
 import Auxiliares.Simetrico;
 
 public class Repetidor extends Thread{
@@ -134,7 +137,98 @@ public class Repetidor extends Thread{
 				}
 			}
 			else if(tipoCifrado == 2) {
-				
+				ServerSocket repetidor = new ServerSocket(REP_PORT+id);
+				Servidor sv = new Servidor(id, tipoCifrado);
+				sv.start();
+				while(centinela) {
+					//Recibe desde el cliente
+					Socket misocket = repetidor.accept();
+					DataInputStream dis = new DataInputStream(misocket.getInputStream());
+					String mensajetexto = dis.readUTF();
+					System.out.println("Llega al repetidor "+id+": "+mensajetexto);
+					
+					
+					//Descifra mensaje del cliente
+					File f = new File("llavesAsimetricas/K_R"+id+"-");
+					FileInputStream fis = new FileInputStream(f);
+					Key key;
+					ObjectInputStream oin = new ObjectInputStream(fis);
+					key = (Key) oin.readObject();
+					fis.close();
+					oin.close();
+					PrivateKey prk = (PrivateKey) key;
+					Asimetrico asm = new Asimetrico();
+					byte[] mensajeEnBytes = asm.str2byte(mensajetexto);
+					byte[] mensajeDescifrado = asm.descifrarConPrivada(mensajeEnBytes, prk);
+					String str = new String(mensajeDescifrado);
+					
+					//Cifrar mensaje del cliente
+					f = new File("llavesAsimetricas/K_S"+id+"+");
+					fis = new FileInputStream(f);
+					oin = new ObjectInputStream(fis);
+					key = (Key) oin.readObject();
+					fis.close();
+					oin.close();
+					PublicKey pub = (PublicKey) key;
+					asm = new Asimetrico();
+					String mensajeClienteDesAStr = new String(mensajeDescifrado);
+					byte[] repetidorCifrando = asm.cifrarConPublica(mensajeClienteDesAStr, pub);
+					String repetidorCifradoString = asm.byte2str(repetidorCifrando);
+					
+					
+					
+					
+					//Envía al servidor
+					Socket enviarAServidor = new Socket(SERVER, SERVER_PORT+id);
+					DataOutputStream oos = new DataOutputStream(enviarAServidor.getOutputStream());
+					oos.writeUTF(repetidorCifradoString);
+					oos.close();
+					enviarAServidor.close();
+					System.out.println("Repetidor "+id+" envía a servidor: "+repetidorCifradoString);
+					misocket.close();
+					
+					
+					//Recibe desde el servidor
+					Socket socketServidor = repetidor.accept();
+					DataInputStream dis2 = new DataInputStream(socketServidor.getInputStream());
+					String obj = dis2.readUTF();
+					System.out.println("Llega al repetidor "+id+" desde el servidor: "+obj);
+					dis2.close();
+					socketServidor.close();
+					
+					//Descifrar mensaje del servidor
+					f = new File("llavesAsimetricas/K_R"+id+"-");
+					fis = new FileInputStream(f);
+					oin = new ObjectInputStream(fis);
+					key = (Key) oin.readObject();
+					fis.close();
+					oin.close();
+					prk = (PrivateKey) key;
+					mensajeEnBytes = asm.str2byte(obj);
+					mensajeDescifrado = asm.descifrarConPrivada(mensajeEnBytes, prk);
+					String mensajeDescifradoString = new String(mensajeDescifrado);
+					
+					//Cifrar mensaje para enviar a cliente
+					f = new File("llavesAsimetricas/K_C"+id+"+");
+					fis = new FileInputStream(f);
+					oin = new ObjectInputStream(fis);
+					key = (Key) oin.readObject();
+					fis.close();
+					oin.close();
+					pub = (PublicKey) key;
+					repetidorCifrando = asm.cifrarConPublica(mensajeDescifradoString, pub);
+					repetidorCifradoString = asm.byte2str(repetidorCifrando);
+					
+					
+					
+					//Envía el repetidor al cliente
+					Socket enviarCliente = new Socket(SERVER, CLIENT_PORT+id);
+					DataOutputStream oos3 = new DataOutputStream(enviarCliente.getOutputStream());
+					oos3.writeUTF(repetidorCifradoString);
+					enviarCliente.close();
+					System.out.println("Repetidor "+id+" envía a cliente: "+repetidorCifradoString);
+					misocket.close();
+				}
 			}
 			
 			
@@ -144,6 +238,9 @@ public class Repetidor extends Thread{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

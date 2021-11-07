@@ -2,6 +2,7 @@ package Auxiliares;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -15,65 +16,66 @@ import java.security.PublicKey;
  */
 //LLaves asimétricas
 public class GeneradorLLavesAsimetricas {
+	private final static String ALGORITHM ="RSA";
 
-	
-	
-	private KeyPairGenerator keyGen;
-	private KeyPair pair;
-	private PrivateKey privateKey;
-	private PublicKey publicKey;
-
-	public GeneradorLLavesAsimetricas(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException {
-		this.keyGen = KeyPairGenerator.getInstance("RSA");
-		this.keyGen.initialize(keylength);
-	}
-
-	public void createKeys() {
-		this.pair = this.keyGen.generateKeyPair();
-		this.privateKey = pair.getPrivate();
-		this.publicKey = pair.getPublic();
-	}
-
-	public PrivateKey getPrivateKey() {
-		return this.privateKey;
-	}
-
-	public PublicKey getPublicKey() {
-		return this.publicKey;
-	}
-
-	public void writeToFile(String path, byte[] key) throws IOException {
-		File f = new File(path);
-		f.getParentFile().mkdirs();
-
-		FileOutputStream fos = new FileOutputStream(f);
-		fos.write(key);
-		fos.flush();
-		fos.close();
-	}
-
-	public static void main(String[] args) {
-		
-
-	}
 	
 	public void generarLLaves(int cantidad) {
-		GeneradorLLavesAsimetricas gk;
 		try {
 			for(int i = 0; i < cantidad; ++i) {
-				gk = new GeneradorLLavesAsimetricas(1024);
-				gk.createKeys();
-				gk.writeToFile("KeyPair/K_C"+i+"-", gk.getPublicKey().getEncoded());
-				gk.writeToFile("KeyPair/K_C"+i+"+", gk.getPrivateKey().getEncoded());
-				gk.writeToFile("KeyPair/K_R"+i+"-", gk.getPrivateKey().getEncoded());
-				gk.writeToFile("KeyPair/K_R"+i+"+", gk.getPrivateKey().getEncoded());
-				gk.writeToFile("KeyPair/K_S"+i+"-", gk.getPrivateKey().getEncoded());
-				gk.writeToFile("KeyPair/K_S"+i+"+", gk.getPrivateKey().getEncoded());
+				
+				KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM);
+				generator.initialize(1024);
+				KeyPair keyPair = generator.generateKeyPair();
+				PublicKey llavePublicaCliente = keyPair.getPublic();
+				PrivateKey llavePrivadaCliente = keyPair.getPrivate();
+				keyPair = generator.generateKeyPair();
+				PublicKey llavePublicaRepetidor= keyPair.getPublic();
+				PrivateKey llavePrivadaRepetidor= keyPair.getPrivate();
+				keyPair = generator.generateKeyPair();
+				PublicKey llavePublicaServidor= keyPair.getPublic();
+				PrivateKey llavePrivadaServidor= keyPair.getPrivate();
+				
+				File file = new File("llavesAsimetricas/K_C"+i+"-");
+				FileOutputStream fos = new FileOutputStream(file);
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				oos.writeObject(llavePrivadaCliente);
+				oos.close();
+				
+				file = new File("llavesAsimetricas/K_C"+i+"+");
+				fos = new FileOutputStream(file);
+				oos = new ObjectOutputStream(fos);
+				oos.writeObject(llavePublicaCliente);
+				oos.close();
+				
+				file = new File("llavesAsimetricas/K_R"+i+"-");
+				fos = new FileOutputStream(file);
+				oos = new ObjectOutputStream(fos);
+				oos.writeObject(llavePrivadaRepetidor);
+				oos.close();
+				
+				file = new File("llavesAsimetricas/K_R"+i+"+");
+				fos = new FileOutputStream(file);
+				oos = new ObjectOutputStream(fos);
+				oos.writeObject(llavePublicaRepetidor);
+				oos.close();
+				
+				file = new File("llavesAsimetricas/K_S"+i+"-");
+				fos = new FileOutputStream(file);
+				oos = new ObjectOutputStream(fos);
+				oos.writeObject(llavePrivadaServidor);
+				oos.close();
+				
+				file = new File("llavesAsimetricas/K_S"+i+"+");
+				fos = new FileOutputStream(file);
+				oos = new ObjectOutputStream(fos);
+				oos.writeObject(llavePublicaServidor);
+				oos.close();
+				
 			}
 			
 			
 			
-		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+		} catch (NoSuchAlgorithmException e) {
 			System.err.println(e.getMessage());
 		} catch (IOException e) {
 			System.err.println(e.getMessage());

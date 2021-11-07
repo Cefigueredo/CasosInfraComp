@@ -10,10 +10,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Random;
 
 import javax.crypto.SecretKey;
 
+import Auxiliares.Asimetrico;
 import Auxiliares.Simetrico;
 
 public class Cliente extends Thread{
@@ -93,12 +96,62 @@ public class Cliente extends Thread{
 				System.out.println("Cliente "+id+" descifra: "+str);
 			}
 			else if(tipoCifrado == 2) {
+				ServerSocket cliente = new ServerSocket(CLIENT_PORT+id);
+				Repetidor rp = new Repetidor(id, tipoCifrado);
+				rp.start();
+				Random rm = new Random();	
+
+				//Elige y cifra el mensaje
+				String mensajeCliente = "0"+rm.nextInt(9);
+				File f = new File("llavesAsimetricas/K_R"+id+"+");
+				FileInputStream fis = new FileInputStream(f);
+				Key key;
+				ObjectInputStream oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				oin.close();
+				PublicKey pk = (PublicKey) key;
+				Asimetrico asm = new Asimetrico();
+				byte[] mensajeCifrado = asm.cifrarConPublica(mensajeCliente, pk);
+				String strMensajecifrado = asm.byte2str(mensajeCifrado);
 				
+
+				//Envía
+				Socket sk = new Socket(SERVER, REP_PORT+id);
+				DataOutputStream flujo= new DataOutputStream(sk.getOutputStream());
+				flujo.writeUTF(strMensajecifrado);
+				flujo.close();
+				sk.close();
+				System.out.println("Cliente "+id+" envía: "+mensajeCliente);
+
+
+				//Recibe
+				Socket misocket = cliente.accept();
+				DataInputStream dis = new DataInputStream(misocket.getInputStream());
+				String obj =  dis.readUTF();
+				System.out.println("Llega al cliente "+id+": "+obj);
+				misocket.close();
+				dis.close();
+				
+				
+				
+				//Descifra mensaje desde repetidor
+				f = new File("llavesAsimetricas/K_C"+id+"-");
+				fis = new FileInputStream(f);
+				oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				fis.close();
+				oin.close();
+				PrivateKey prk= (PrivateKey) key;
+				asm = new Asimetrico();
+				byte[] mensajeEnBytes = asm.str2byte(obj);
+				byte[] mensajeDescifrado = asm.descifrarConPrivada(mensajeEnBytes, prk);
+				String str = new String(mensajeDescifrado);
+				System.out.println("Cliente "+id+" descifra: "+str);
 			}
 			
 
 
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
