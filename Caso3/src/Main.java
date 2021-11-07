@@ -1,37 +1,38 @@
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Scanner;
 
-import javax.crypto.SecretKey;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import Auxiliares.GeneradorLLaveSimetrica;
+import Auxiliares.GeneradorLLavesAsimetricas;
 
 public class Main {
-	public static void main(String[] args) throws IOException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException {
 		
 		//Pide cantidad de clientes y si usa cifrado simétrico o asimétrico
-		Scanner sc=new Scanner(System.in);  
-		
-		
-		System.out.println("Ingrese la cantidad de clientes: ");
-		int cantidadClientes = sc.nextInt();
+		File file = new File("escenario.txt");
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		br.readLine();
+		String line = br.readLine();
+	
+		int cantidadClientes = Integer.parseInt(line);
 		System.out.println("Usted eligió "+cantidadClientes+" clientes.");
+		br.readLine();
+		line = br.readLine();
 		
-		System.out.println("Ingrese 1 si quiere usar cifrado simétrico o 2 si quiere usar cifrado asimétrico: ");
-		int nTipoCifrado = sc.nextInt();
+		int nTipoCifrado = Integer.parseInt(line);
 		
-		
-		while(nTipoCifrado!=1 && nTipoCifrado!=2) {
-			System.out.println("Error, digite nuevamente: ");
-			nTipoCifrado = sc.nextInt();
-		}
-		
-		if(nTipoCifrado==1) {
+		if(nTipoCifrado==1) {//Generando llaves simétricas
 			System.out.println("Usted eligió cifrado simétrico");
+			System.out.println("Generando llaves simétricas...");
+			new GeneradorLLaveSimetrica().generarLLaves(cantidadClientes);
 		}
-		else if(nTipoCifrado==2) {
+		else if(nTipoCifrado==2) {//Generando llaves asimétricas
 			System.out.println("Usted eligió cifrado asimétrico");
+			System.out.println("Generando llaves asimétricas...");
+			new GeneradorLLavesAsimetricas(1024).generarLLaves(cantidadClientes);
 		}
 		else {
 			System.out.println("Error");
@@ -39,12 +40,13 @@ public class Main {
 		
 		
 		
-		//Toma las llaves de los archivos
-		FileInputStream archivo = new FileInputStream("llaveSimetrica");
-		ObjectInputStream ois = new ObjectInputStream(archivo);
-		SecretKey sk = (SecretKey) ois.readObject();
-		ois.close();
-		System.out.println("Algoritmo de la llave es: "+sk.getAlgorithm());
+		
+		
+		for(int i = 0; i < cantidadClientes; ++i) {
+			
+			Cliente cl = new Cliente(i);
+			cl.start();
+		}
 		
 		
 		//Ejecuta 

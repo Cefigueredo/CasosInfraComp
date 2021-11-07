@@ -1,3 +1,4 @@
+package Auxiliares;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,6 +8,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.Scanner;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -17,21 +19,32 @@ import javax.crypto.spec.SecretKeySpec;
  *
  */
 //LLave simétrica
-public class CreadorDeLlaves {
-
+public class GeneradorLLaveSimetrica {
 
 	private final static String PADDING = "AES/ECB/PKCS5Padding";
 	private final static String ALGORITMO = "AES";
 	public static void main(String[] args) throws NoSuchAlgorithmException, CertificateException, IOException {
-		KeyGenerator keygen = KeyGenerator.getInstance(ALGORITMO);
-		SecretKey secretKey = keygen.generateKey();
-		System.out.println("llave creada: "+secretKey.toString());
-		FileOutputStream archivo = new FileOutputStream("llaveSimetrica");
-		ObjectOutputStream oos = new ObjectOutputStream(archivo);
-		
-		oos.writeObject(secretKey);
-		oos.close();
-		System.out.println("Llave guardada");
+
 	}
-	
+
+	public void generarLLaves(int cantidad) throws NoSuchAlgorithmException, IOException {
+		KeyGenerator keygen = KeyGenerator.getInstance(ALGORITMO);
+
+		for(int i = 0; i < cantidad; ++i) {
+			SecretKey secretKey = keygen.generateKey();
+			FileOutputStream archivo = new FileOutputStream("llavesSimetricas/K_C"+i+"R"+i);
+			ObjectOutputStream oos = new ObjectOutputStream(archivo);
+			oos.writeObject(secretKey);
+			archivo.close();
+			oos.close();
+
+			secretKey = keygen.generateKey();
+			FileOutputStream archivo2 = new FileOutputStream("llavesSimetricas/K_R"+i+"S"+i);
+			ObjectOutputStream oos2 = new ObjectOutputStream(archivo2);
+			oos2.writeObject(secretKey);
+			archivo2.close();
+			oos2.close();
+
+		}
+	}
 }

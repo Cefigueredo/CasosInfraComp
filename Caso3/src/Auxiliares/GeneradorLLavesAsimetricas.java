@@ -1,3 +1,4 @@
+package Auxiliares;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,15 +13,17 @@ import java.security.PublicKey;
  * @author Carlos
  *
  */
-//LLave asimétrica
-public class GenerateKeys {
+//LLaves asimétricas
+public class GeneradorLLavesAsimetricas {
 
+	
+	
 	private KeyPairGenerator keyGen;
 	private KeyPair pair;
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
 
-	public GenerateKeys(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException {
+	public GeneradorLLavesAsimetricas(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException {
 		this.keyGen = KeyPairGenerator.getInstance("RSA");
 		this.keyGen.initialize(keylength);
 	}
@@ -50,18 +53,31 @@ public class GenerateKeys {
 	}
 
 	public static void main(String[] args) {
-		GenerateKeys gk;
+		
+
+	}
+	
+	public void generarLLaves(int cantidad) {
+		GeneradorLLavesAsimetricas gk;
 		try {
-			gk = new GenerateKeys(1024);
-			gk.createKeys();
-			gk.writeToFile("KeyPair/asymmetricPublicKey", gk.getPublicKey().getEncoded());
-			gk.writeToFile("KeyPair/asymmetricPrivateKey", gk.getPrivateKey().getEncoded());
+			for(int i = 0; i < cantidad; ++i) {
+				gk = new GeneradorLLavesAsimetricas(1024);
+				gk.createKeys();
+				gk.writeToFile("KeyPair/K_C"+i+"-", gk.getPublicKey().getEncoded());
+				gk.writeToFile("KeyPair/K_C"+i+"+", gk.getPrivateKey().getEncoded());
+				gk.writeToFile("KeyPair/K_R"+i+"-", gk.getPrivateKey().getEncoded());
+				gk.writeToFile("KeyPair/K_R"+i+"+", gk.getPrivateKey().getEncoded());
+				gk.writeToFile("KeyPair/K_S"+i+"-", gk.getPrivateKey().getEncoded());
+				gk.writeToFile("KeyPair/K_S"+i+"+", gk.getPrivateKey().getEncoded());
+			}
+			
+			
+			
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			System.err.println(e.getMessage());
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
-
 	}
 
 }

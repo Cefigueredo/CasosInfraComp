@@ -1,0 +1,4 @@
+//Ponga debajo la cantidad de clientes
+3
+//Ponga debajo 1 si quiere cifrado simétrico o 2 si quiere cifrado asimétrico
+1
