@@ -5,11 +5,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
+import java.util.concurrent.CyclicBarrier;
+
 import Auxiliares.GeneradorLLaveSimetrica;
 import Auxiliares.GeneradorLLavesAsimetricas;
 
-public class Main {
-	public static void main(String[] args) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException {
+public class Main extends Thread {
+	
+	public static ArrayList<Integer> listaDeTiempos = new ArrayList<Integer>();
+	
+	public static boolean esperar = false;
+	public static void main(String[] args) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InterruptedException {
 		
 		//Pide cantidad de clientes y si usa cifrado simétrico o asimétrico
 		File file = new File("escenario.txt");
@@ -38,10 +45,24 @@ public class Main {
 			System.out.println("Error");
 		}
 		
+		CyclicBarrier cb = new CyclicBarrier(cantidadClientes);
+		
 		
 		for(int i = 0; i < cantidadClientes; ++i) {	
-			Cliente cl = new Cliente(i, nTipoCifrado);
+			Cliente cl = new Cliente(i, nTipoCifrado, cb);
 			cl.start();
 		}
+		
+		while(listaDeTiempos.size()<cantidadClientes) {
+			sleep(100);
+		}
+		
+		
+		double tiempoPromedio = 0;
+		for(int i = 0; i < cantidadClientes; ++i) {
+			tiempoPromedio += listaDeTiempos.get(i);
+		}
+		tiempoPromedio = tiempoPromedio/cantidadClientes;
+		System.out.println("Tiempo promedio en repetidores: "+tiempoPromedio);
 	}
 }

@@ -40,6 +40,14 @@ public class Repetidor extends Thread{
 	
 	public void run() {
 		try {
+			Socket enviarRaC = new Socket(SERVER, CLIENT_PORT+id);
+			DataOutputStream oos1 = new DataOutputStream(enviarRaC.getOutputStream());
+			String mensajeRaC="OK";
+			System.out.println("Repetidor "+id+" envía a cliente: "+mensajeRaC);
+			oos1.writeUTF(mensajeRaC);
+			enviarRaC.close();
+			long tiempoTotal = 0;
+			
 			if(tipoCifrado == 1) {
 				ServerSocket repetidor = new ServerSocket(REP_PORT+id);
 				Servidor sv = new Servidor(id, tipoCifrado);
@@ -51,6 +59,7 @@ public class Repetidor extends Thread{
 					String mensajetexto = dis.readUTF();
 					System.out.println("Llega al repetidor "+id+": "+mensajetexto);
 					
+					long tiempoInicial1 = System.currentTimeMillis();
 					
 					//Descifra mensaje del cliente
 					File f = new File("llavesSimetricas/K_C"+id+"R"+id);
@@ -79,16 +88,17 @@ public class Repetidor extends Thread{
 					byte[] repetidorCifrando = sm.cifrar(secret, mensajeClienteDesAStr);
 					String repetidorCifradoString = sm.byte2str(repetidorCifrando);
 					
-					
+					long tiempoFinal1 = System.currentTimeMillis() - tiempoInicial1;
 					
 					
 					//Envía al servidor
 					Socket enviarAServidor = new Socket(SERVER, SERVER_PORT+id);
 					DataOutputStream oos = new DataOutputStream(enviarAServidor.getOutputStream());
+					System.out.println("Repetidor "+id+" envía a servidor: "+repetidorCifradoString);
 					oos.writeUTF(repetidorCifradoString);
 					oos.close();
 					enviarAServidor.close();
-					System.out.println("Repetidor "+id+" envía a servidor: "+repetidorCifradoString);
+					
 					misocket.close();
 					
 					
@@ -99,6 +109,8 @@ public class Repetidor extends Thread{
 					System.out.println("Llega al repetidor "+id+" desde el servidor: "+obj);
 					dis2.close();
 					socketServidor.close();
+					
+					long tiempoInicial2 = System.currentTimeMillis();
 					
 					//Descifrar mensaje del servidor
 					f = new File("llavesSimetricas/K_R"+id+"S"+id);
@@ -126,14 +138,16 @@ public class Repetidor extends Thread{
 					repetidorCifradoString = sm.byte2str(repetidorCifrando);
 					
 					
-					
+					long tiempoFinal2 = System.currentTimeMillis() - tiempoInicial2;
+					tiempoTotal = tiempoFinal1+tiempoFinal2;
+					System.out.println("Tiempo total en repetidor "+id+" es: "+tiempoTotal);
+					Main.listaDeTiempos.add((int) tiempoTotal);
 					//Envía el repetidor al cliente
 					Socket enviarCliente = new Socket(SERVER, CLIENT_PORT+id);
 					DataOutputStream oos3 = new DataOutputStream(enviarCliente.getOutputStream());
+					System.out.println("Repetidor "+id+" envía a cliente: "+repetidorCifradoString);
 					oos3.writeUTF(repetidorCifradoString);
 					enviarCliente.close();
-					System.out.println("Repetidor "+id+" envía a cliente: "+repetidorCifradoString);
-					misocket.close();
 				}
 			}
 			else if(tipoCifrado == 2) {
@@ -146,7 +160,7 @@ public class Repetidor extends Thread{
 					DataInputStream dis = new DataInputStream(misocket.getInputStream());
 					String mensajetexto = dis.readUTF();
 					System.out.println("Llega al repetidor "+id+": "+mensajetexto);
-					
+					long tiempoInicial1 = System.currentTimeMillis();
 					
 					//Descifra mensaje del cliente
 					File f = new File("llavesAsimetricas/K_R"+id+"-");
@@ -175,7 +189,7 @@ public class Repetidor extends Thread{
 					byte[] repetidorCifrando = asm.cifrarConPublica(mensajeClienteDesAStr, pub);
 					String repetidorCifradoString = asm.byte2str(repetidorCifrando);
 					
-					
+					long tiempoFinal1 = System.currentTimeMillis() - tiempoInicial1;
 					
 					
 					//Envía al servidor
@@ -196,6 +210,7 @@ public class Repetidor extends Thread{
 					dis2.close();
 					socketServidor.close();
 					
+					long tiempoInicial2 = System.currentTimeMillis();
 					//Descifrar mensaje del servidor
 					f = new File("llavesAsimetricas/K_R"+id+"-");
 					fis = new FileInputStream(f);
@@ -219,8 +234,10 @@ public class Repetidor extends Thread{
 					repetidorCifrando = asm.cifrarConPublica(mensajeDescifradoString, pub);
 					repetidorCifradoString = asm.byte2str(repetidorCifrando);
 					
-					
-					
+					long tiempoFinal2 = System.currentTimeMillis() - tiempoInicial2;
+					tiempoTotal = tiempoFinal1+tiempoFinal2;
+					System.out.println("Tiempo total en repetidor "+id+" es: "+tiempoTotal);
+					Main.listaDeTiempos.add((int) tiempoTotal);
 					//Envía el repetidor al cliente
 					Socket enviarCliente = new Socket(SERVER, CLIENT_PORT+id);
 					DataOutputStream oos3 = new DataOutputStream(enviarCliente.getOutputStream());
@@ -229,6 +246,7 @@ public class Repetidor extends Thread{
 					System.out.println("Repetidor "+id+" envía a cliente: "+repetidorCifradoString);
 					misocket.close();
 				}
+				
 			}
 			
 			

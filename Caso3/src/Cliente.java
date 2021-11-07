@@ -13,6 +13,7 @@ import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Random;
+import java.util.concurrent.CyclicBarrier;
 
 import javax.crypto.SecretKey;
 
@@ -32,24 +33,36 @@ public class Cliente extends Thread{
 	private static int REP_PORT = 5000;
 	private int id;
 	private int tipoCifrado;
-
-	public Cliente(int id, int tipoCifrado){
+	private CyclicBarrier cb;
+	public Cliente(int id, int tipoCifrado, CyclicBarrier cb){
 		this.id = id;
 		this.tipoCifrado = tipoCifrado;
+		this.cb = cb;
 	}
 
 
 	public void run() {
 
 		try {
+			ServerSocket cliente = new ServerSocket(CLIENT_PORT+id);
+			Repetidor rp = new Repetidor(id, tipoCifrado);
+			rp.start();
+			Random rm = new Random();	
+
+			//Recibe OK del repetidor
+			Socket socketRaC = cliente.accept();
+			DataInputStream disRaC = new DataInputStream(socketRaC.getInputStream());
+			String mensajeRaC =  disRaC.readUTF();
+			System.out.println("Llega al cliente "+id+": "+mensajeRaC);
+			socketRaC.close();
+			disRaC.close();
+			
+			
 			if(tipoCifrado == 1) {
-				ServerSocket cliente = new ServerSocket(CLIENT_PORT+id);
-				Repetidor rp = new Repetidor(id, tipoCifrado);
-				rp.start();
-				Random rm = new Random();	
 
 				//Elige y cifra el mensaje
-				String mensajeCliente = "0"+rm.nextInt(9);
+				String mensajeCliente = "0"+rm.nextInt(9); 
+				System.out.println("Cliente "+id+" elige mensaje: "+mensajeCliente);
 				File f = new File("llavesSimetricas/K_C"+id+"R"+id);
 				FileInputStream fis = new FileInputStream(f);
 				Key key;
@@ -65,10 +78,11 @@ public class Cliente extends Thread{
 				//Envía
 				Socket sk = new Socket(SERVER, REP_PORT+id);
 				DataOutputStream flujo= new DataOutputStream(sk.getOutputStream());
-				flujo.writeUTF(strMensajecifrado);
+				System.out.println("Cliente "+id+" envía: "+strMensajecifrado);
+				flujo.writeUTF(strMensajecifrado); 
 				flujo.close();
 				sk.close();
-				System.out.println("Cliente "+id+" envía: "+mensajeCliente);
+				
 
 
 				//Recibe
@@ -96,10 +110,6 @@ public class Cliente extends Thread{
 				System.out.println("Cliente "+id+" descifra: "+str);
 			}
 			else if(tipoCifrado == 2) {
-				ServerSocket cliente = new ServerSocket(CLIENT_PORT+id);
-				Repetidor rp = new Repetidor(id, tipoCifrado);
-				rp.start();
-				Random rm = new Random();	
 
 				//Elige y cifra el mensaje
 				String mensajeCliente = "0"+rm.nextInt(9);
@@ -118,10 +128,10 @@ public class Cliente extends Thread{
 				//Envía
 				Socket sk = new Socket(SERVER, REP_PORT+id);
 				DataOutputStream flujo= new DataOutputStream(sk.getOutputStream());
-				flujo.writeUTF(strMensajecifrado);
+				flujo.writeUTF(strMensajecifrado); System.out.println("Cliente "+id+" envía: "+mensajeCliente);
 				flujo.close();
 				sk.close();
-				System.out.println("Cliente "+id+" envía: "+mensajeCliente);
+				
 
 
 				//Recibe
@@ -149,7 +159,8 @@ public class Cliente extends Thread{
 				System.out.println("Cliente "+id+" descifra: "+str);
 			}
 			
-
+			cb.await();
+			Main.esperar = true;
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
