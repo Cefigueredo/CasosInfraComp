@@ -39,16 +39,9 @@ public class Main {
 		}
 		
 		
-		
-		
-		
-		for(int i = 0; i < cantidadClientes; ++i) {
-			
-			Cliente cl = new Cliente(i);
+		for(int i = 0; i < cantidadClientes; ++i) {	
+			Cliente cl = new Cliente(i, nTipoCifrado);
 			cl.start();
 		}
-		
-		
-		//Ejecuta 
 	}
 }

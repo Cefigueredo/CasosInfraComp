@@ -28,66 +28,74 @@ public class Cliente extends Thread{
 	private static int CLIENT_PORT = 4000;
 	private static int REP_PORT = 5000;
 	private int id;
+	private int tipoCifrado;
 
-	public Cliente(int id){
+	public Cliente(int id, int tipoCifrado){
 		this.id = id;
+		this.tipoCifrado = tipoCifrado;
 	}
 
 
 	public void run() {
 
 		try {
-			ServerSocket cliente = new ServerSocket(CLIENT_PORT+id);
-			Repetidor rp = new Repetidor(id);
-			rp.start();
-			Random rm = new Random();	
+			if(tipoCifrado == 1) {
+				ServerSocket cliente = new ServerSocket(CLIENT_PORT+id);
+				Repetidor rp = new Repetidor(id, tipoCifrado);
+				rp.start();
+				Random rm = new Random();	
 
-			//Elige y cifra el mensaje
-			String mensajeCliente = "0"+rm.nextInt(9);
-			File f = new File("llavesSimetricas/K_C"+id+"R"+id);
-			FileInputStream fis = new FileInputStream(f);
-			Key key;
-			ObjectInputStream oin = new ObjectInputStream(fis);
-			key = (Key) oin.readObject();
-			oin.close();
-			SecretKey secret = (SecretKey) key;
-			Simetrico sm = new Simetrico();
-			byte[] mensajeCifrado = sm.cifrar(secret, mensajeCliente);
-			String strMensajecifrado = sm.byte2str(mensajeCifrado);
-			
+				//Elige y cifra el mensaje
+				String mensajeCliente = "0"+rm.nextInt(9);
+				File f = new File("llavesSimetricas/K_C"+id+"R"+id);
+				FileInputStream fis = new FileInputStream(f);
+				Key key;
+				ObjectInputStream oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				oin.close();
+				SecretKey secret = (SecretKey) key;
+				Simetrico sm = new Simetrico();
+				byte[] mensajeCifrado = sm.cifrar(secret, mensajeCliente);
+				String strMensajecifrado = sm.byte2str(mensajeCifrado);
+				
 
-			//Envía
-			Socket sk = new Socket(SERVER, REP_PORT+id);
-			DataOutputStream flujo= new DataOutputStream(sk.getOutputStream());
-			flujo.writeUTF(strMensajecifrado);
-			flujo.close();
-			sk.close();
-			System.out.println("Cliente "+id+" envía: "+mensajeCliente);
+				//Envía
+				Socket sk = new Socket(SERVER, REP_PORT+id);
+				DataOutputStream flujo= new DataOutputStream(sk.getOutputStream());
+				flujo.writeUTF(strMensajecifrado);
+				flujo.close();
+				sk.close();
+				System.out.println("Cliente "+id+" envía: "+mensajeCliente);
 
 
-			//Recibe
-			Socket misocket = cliente.accept();
-			DataInputStream dis = new DataInputStream(misocket.getInputStream());
-			String obj =  dis.readUTF();
-			System.out.println("Llega al cliente "+id+": "+obj);
-			misocket.close();
-			dis.close();
+				//Recibe
+				Socket misocket = cliente.accept();
+				DataInputStream dis = new DataInputStream(misocket.getInputStream());
+				String obj =  dis.readUTF();
+				System.out.println("Llega al cliente "+id+": "+obj);
+				misocket.close();
+				dis.close();
+				
+				
+				
+				//Descifra mensaje desde repetidor
+				f = new File("llavesSimetricas/K_C"+id+"R"+id);
+				fis = new FileInputStream(f);
+				oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				fis.close();
+				oin.close();
+				secret = (SecretKey) key;
+				sm = new Simetrico();
+				byte[] mensajeEnBytes = sm.str2byte(obj);
+				byte[] mensajeDescifrado = sm.descifrar(secret, mensajeEnBytes);
+				String str = new String(mensajeDescifrado);
+				System.out.println("Cliente "+id+" descifra: "+str);
+			}
+			else if(tipoCifrado == 2) {
+				
+			}
 			
-			
-			
-			//Descifra mensaje desde repetidor
-			f = new File("llavesSimetricas/K_C"+id+"R"+id);
-			fis = new FileInputStream(f);
-			oin = new ObjectInputStream(fis);
-			key = (Key) oin.readObject();
-			fis.close();
-			oin.close();
-			secret = (SecretKey) key;
-			sm = new Simetrico();
-			byte[] mensajeEnBytes = sm.str2byte(obj);
-			byte[] mensajeDescifrado = sm.descifrar(secret, mensajeEnBytes);
-			String str = new String(mensajeDescifrado);
-			System.out.println("Cliente "+id+" descifra: "+str);
 
 
 		} catch (IOException | ClassNotFoundException e) {
