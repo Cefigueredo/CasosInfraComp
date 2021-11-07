@@ -1,11 +1,17 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.Key;
+
+import javax.crypto.SecretKey;
+
+import Auxiliares.Simetrico;
 
 public class Repetidor extends Thread{
 	//Punto intermedio de comunicación entre un cliente y el servidor.
@@ -42,31 +48,87 @@ public class Repetidor extends Thread{
 				System.out.println("Llega al repetidor "+id+": "+mensajetexto);
 				
 				
+				//Descifra mensaje del cliente
+				File f = new File("llavesSimetricas/K_C"+id+"R"+id);
+				FileInputStream fis = new FileInputStream(f);
+				Key key;
+				ObjectInputStream oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				fis.close();
+				oin.close();
+				SecretKey secret = (SecretKey) key;
+				Simetrico sm = new Simetrico();
+				byte[] mensajeEnBytes = sm.str2byte(mensajetexto);
+				byte[] mensajeDescifrado = sm.descifrar(secret, mensajeEnBytes);
+				String str = new String(mensajeDescifrado);
+				
+				//Cifrar mensaje del cliente
+				f = new File("llavesSimetricas/K_R"+id+"S"+id);
+				fis = new FileInputStream(f);
+				oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				fis.close();
+				oin.close();
+				secret = (SecretKey) key;
+				sm = new Simetrico();
+				String mensajeClienteDesAStr = new String(mensajeDescifrado);
+				byte[] repetidorCifrando = sm.cifrar(secret, mensajeClienteDesAStr);
+				String repetidorCifradoString = sm.byte2str(repetidorCifrando);
+				
+				
+				
 				
 				//Envía al servidor
 				Socket enviarAServidor = new Socket(SERVER, SERVER_PORT+id);
 				DataOutputStream oos = new DataOutputStream(enviarAServidor.getOutputStream());
-				oos.writeUTF(mensajetexto);
+				oos.writeUTF(repetidorCifradoString);
 				oos.close();
 				enviarAServidor.close();
-				System.out.println("Repetidor "+id+" envía: "+mensajetexto);
+				System.out.println("Repetidor "+id+" envía a servidor: "+repetidorCifradoString);
 				misocket.close();
 				
 				
 				//Recibe desde el servidor
 				Socket socketServidor = repetidor.accept();
-				ObjectInputStream dis2 = new ObjectInputStream(socketServidor.getInputStream());
-				File obj = (File) dis2.readObject();
-				System.out.println("Llega al repetidor "+id+": "+obj.getName());
+				DataInputStream dis2 = new DataInputStream(socketServidor.getInputStream());
+				String obj = dis2.readUTF();
+				System.out.println("Llega al repetidor "+id+" desde el servidor: "+obj);
+				dis2.close();
+				socketServidor.close();
+				
+				//Descifrar mensaje del servidor
+				f = new File("llavesSimetricas/K_R"+id+"S"+id);
+				fis = new FileInputStream(f);
+				oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				fis.close();
+				oin.close();
+				secret = (SecretKey) key;
+				sm = new Simetrico();
+				mensajeEnBytes = sm.str2byte(obj);
+				mensajeDescifrado = sm.descifrar(secret, mensajeEnBytes);
+				String mensajeDescifradoString = new String(mensajeDescifrado);
+				
+				//Cifrar mensaje para enviar a cliente
+				f = new File("llavesSimetricas/K_C"+id+"R"+id);
+				fis = new FileInputStream(f);
+				oin = new ObjectInputStream(fis);
+				key = (Key) oin.readObject();
+				fis.close();
+				oin.close();
+				secret = (SecretKey) key;
+				sm = new Simetrico();
+				repetidorCifrando = sm.cifrar(secret, mensajeDescifradoString);
+				repetidorCifradoString = sm.byte2str(repetidorCifrando);
 				
 				
-				//Envía al repetidor
+				
+				//Envía el repetidor al cliente
 				Socket enviarCliente = new Socket(SERVER, CLIENT_PORT+id);
-				ObjectOutputStream oos3 = new ObjectOutputStream(enviarCliente.getOutputStream());
-				File myObj = new File("mensajes/"+mensajetexto+".txt");
-				oos3.writeObject(myObj);
+				DataOutputStream oos3 = new DataOutputStream(enviarCliente.getOutputStream());
+				oos3.writeUTF(repetidorCifradoString);
 				enviarCliente.close();
-				System.out.println("Repetidor "+id+" envía a cliente: "+mensajetexto);
+				System.out.println("Repetidor "+id+" envía a cliente: "+repetidorCifradoString);
 				misocket.close();
 			}
 				
